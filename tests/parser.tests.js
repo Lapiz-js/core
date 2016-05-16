@@ -34,3 +34,13 @@ Lapiz.Test("Parse/Bool", function(t){
   p.bool("test") === true || t.error("string to bool failed")
   p.bool("") === false    || t.error("empty string to bool failed")
 });
+
+Lapiz.Test("Parse/Array", ["Parse/Int"], function(t){
+  var intArr = [3,"1",4.001];
+  var intArrParser = Lapiz.parse.array("int");
+  intArr = intArrParser(intArr);
+
+  intArr[0] === 3 || t.error("Error at 0");
+  intArr[1] === 1 || t.error("Error at 1");
+  intArr[2] === 4 || t.error("Error at 2");
+});

@@ -1,5 +1,5 @@
 Lapiz.Module("Sorter", function($L){
-  $L.Sort = function(accessor, funcOrField){
+  $L.set($L, "Sort", function(accessor, funcOrField){
     var self = function(key){ return accessor(key); };
     self._cls = $L.Sort;
 
@@ -41,15 +41,9 @@ Lapiz.Module("Sorter", function($L){
     }
     _index.sort(_sortFn);
 
-    self.has = accessor.has;
-    self.Accessor = accessor;
-    self.Sort = accessor.Sort;
-    self.Filter = accessor.Filter;
-    Object.defineProperty(self, "keys",{
-      get: function(){ return _index.slice(0); }
-    });
-    Object.defineProperty(self, "len",{
-      get: function(){ return accessor.len; }
+    $L.Map.copyProps(self, accessor, "has", "Accessor", "Sort", "Filter", "&length");
+    $L.Map.getter(self, function keys(){
+      return _index.slice(0);
     });
 
     self.each = function(fn){
@@ -62,9 +56,9 @@ Lapiz.Module("Sorter", function($L){
     };
 
     self.on = $L.Map();
-    $L.Event.LinkProperty(self.on, "insert", _insertEvent);
-    $L.Event.LinkProperty(self.on, "change", _changeEvent);
-    $L.Event.LinkProperty(self.on, "remove", _removeEvent);
+    $L.Event.linkProperty(self.on, "insert", _insertEvent);
+    $L.Event.linkProperty(self.on, "change", _changeEvent);
+    $L.Event.linkProperty(self.on, "remove", _removeEvent);
     Object.freeze(self.on);
 
     Object.defineProperty(self, "func", {
@@ -120,10 +114,11 @@ Lapiz.Module("Sorter", function($L){
 
     Object.freeze(self);
     return self;
-  };
+  });
 
   //returns the index of the first value greater than or equal to the key
   $L.Sort.locationOf = function(key, index, fn, accessor, start, end) {
+    //todo: add test
     start = start || 0;
     end = end || index.length;
     var pivot = Math.floor(start + (end - start) / 2);
@@ -132,18 +127,16 @@ Lapiz.Module("Sorter", function($L){
     }
     if (end-start === 1) {
       // 1 := a>b      0 := a<=b
-      if (fn(index[pivot],  key, accessor) >= 0 ) { return start; }
-      return end;
+      return (fn(index[pivot],  key, accessor) >= 0 ) ? start : end; 
     }
-    if (fn(index[pivot], key, accessor) <= 0) {
-      return $L.Sort.locationOf(key, index, fn, accessor, pivot, end);
-    } else {
-      return $L.Sort.locationOf(key, index, fn, accessor, start, pivot);
-    }
+    return (fn(index[pivot], key, accessor) <= 0) ?
+      $L.Sort.locationOf(key, index, fn, accessor, pivot, end) :
+      $L.Sort.locationOf(key, index, fn, accessor, start, pivot);
   };
 
   //returns the index of the first value greater than key
   $L.Sort.gt = function (key, index, fn, accessor, start, end) {
+    //todo: add test
     start = start || 0;
     end = end || index.length;
     var pivot = Math.floor(start + (end - start) / 2);
@@ -152,13 +145,10 @@ Lapiz.Module("Sorter", function($L){
     }
     if (end-start === 1) {
       // 1 := a>b      0 := a<=b
-      if (fn(index[pivot], key, accessor) < 0 ) { return start; }
-      return end;
+      return (fn(index[pivot], key, accessor) < 0 ) ? start : end; 
     }
-    if (fn(index[pivot], key, accessor) < 0) {
-      return $L.Sort.locationOf(key, index, fn, accessor, pivot, end);
-    } else {
-      return $L.Sort.locationOf(key, index, fn, accessor, start, pivot);
-    }
+    return (fn(index[pivot], key, accessor) < 0) ?
+      $L.Sort.locationOf(key, index, fn, accessor, pivot, end) :
+      $L.Sort.locationOf(key, index, fn, accessor, start, pivot);
   }
 });

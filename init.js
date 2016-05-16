@@ -1,7 +1,9 @@
 /**
  * @namespace Lapiz
  */
-var Lapiz = Object.create(null);
+var Lapiz = (function($L) {
+  return $L || Object.create(null);
+}(Lapiz));
 
 /**
  * @namespace ModuleLoaderModule
@@ -24,10 +26,10 @@ var Lapiz = (function ModuleLoaderModule($L){
     return notLoaded;
   };
 
-  function set(name, value){
-    Object.defineProperty($L, name, { value: value });
+  function set(obj, name, value){
+    Object.defineProperty(obj, name, { value: value });
   }
-  set("set", set);
+  set($L, "set", set);
 
   function _updatePending(name){
     var i, pending, idx;
@@ -53,7 +55,7 @@ var Lapiz = (function ModuleLoaderModule($L){
     }
   }
 
-  $L.set("Module", function(name, reqs, module){
+  $L.set($L, "Module", function(name, reqs, module){
     //Not doing detailed checks here. If you're writing a module, you should be able to load it correctly.
     if (module === undefined){
       module = reqs;
@@ -78,6 +80,24 @@ var Lapiz = (function ModuleLoaderModule($L){
     return Object.keys(_loaded);
   };
   Object.freeze(self.Module);
-  
+
+  $L.set($L, "typeCheck", function(obj, type, err){
+    var typeCheck = (typeof type === "string") ? (typeof obj === type) : (obj instanceof type);
+    if (err !== undefined && !typeCheck){
+      throw new Error(err);
+    }
+    return typeCheck;
+  });
+  $L.set($L.typeCheck, "function", function(obj, err){return $L.typeCheck(obj, Function, err)});
+  $L.set($L.typeCheck, "array", function(obj, err){return $L.typeCheck(obj, Array, err)});
+  $L.set($L.typeCheck, "string", function(obj, err){return $L.typeCheck(obj, "string", err)});
+  $L.set($L.typeCheck, "number", function(obj, err){return $L.typeCheck(obj, "number", err)});
+
+  $L.set($L, "assert", function(bool, err){
+    if (!bool){
+      throw new Error(err);
+    }
+  });
+
   return $L;
 })(Lapiz);

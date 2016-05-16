@@ -1,6 +1,6 @@
 Lapiz.Module("Dictionary", function($L){
-  $L.set("Dictionary", function(val){
-    var _dict = {};
+  $L.set($L, "Dictionary", function(val){
+    var _dict = $L.Map();
     var _length = 0;
     var _insertEvent = Lapiz.Event();
     var _removeEvent = Lapiz.Event();
@@ -20,46 +20,46 @@ Lapiz.Module("Dictionary", function($L){
       }
     }
 
-    var self = function(field, val){
+    var self = function(key, val){
       if (val === undefined){
-        return _dict[field];
+        return _dict[key];
       }
 
       var event;
-      if (!_dict.hasOwnProperty(field)){
+      if (_dict[key] === undefined){
         _length += 1;
         event = _insertEvent;
       } else {
         event = _changeEvent;
       }
 
-      _dict[field] = val;
-      event.fire(field, self.Accessor);
+      _dict[key] = val;
+      event.fire(key, self.Accessor);
       return val;
     };
 
     self._cls = $L.Dictionary;
 
-    Object.defineProperty(self, "len", {
-      get: function(){return _length;}
+    $L.Map.getter(self, function length(){
+      return _length;
     });
 
-    self.remove = function(field){
-      if (_dict.hasOwnProperty(field)){
+    self.remove = function(key){
+      if (_dict[key] !== undefined){
         _length -= 1;
-        var obj = _dict[field];
-        delete _dict[field];
-        _removeEvent.fire(field, obj, self.Accessor);
+        var obj = _dict[key];
+        delete _dict[key];
+        _removeEvent.fire(key, obj, self.Accessor);
       }
     };
 
     self.on = $L.Map();
-    $L.Event.LinkProperty(self.on, "insert", _insertEvent);
-    $L.Event.LinkProperty(self.on, "change", _changeEvent);
-    $L.Event.LinkProperty(self.on, "remove", _removeEvent);
+    $L.Event.linkProperty(self.on, "insert", _insertEvent);
+    $L.Event.linkProperty(self.on, "change", _changeEvent);
+    $L.Event.linkProperty(self.on, "remove", _removeEvent);
     Object.freeze(self.on);
 
-    self.has = function(field){ return _dict.hasOwnProperty(field); };
+    self.has = function(key){ return _dict[key] !== undefined; };
 
     self.each = function(fn){
       var keys = Object.keys(_dict);
@@ -70,8 +70,8 @@ Lapiz.Module("Dictionary", function($L){
       }
     };
 
-    Object.defineProperty(self, "keys", {
-      get: function(){ return Object.keys(_dict); }
+    $L.Map.getter(self, function keys(){
+      return Object.keys(_dict);
     });
 
     self.Sort = function(funcOrField){ return $L.Sort(self, funcOrField); };
@@ -80,28 +80,16 @@ Lapiz.Module("Dictionary", function($L){
     self.Accessor = function(key){
       return _dict[key];
     };
-    self.Accessor.Accessor = self.Accessor; //meta, but necessary
-    self.Accessor.len = self.len;
-    self.Accessor.has = self.has;
-    self.Accessor.each = self.each;
-    self.Accessor.on = self.on;
-    self.Accessor.Sort = self.Sort;
-    self.Accessor.Filter = self.Filter;
+    $L.Map.copyProps(self.Accessor, self, "Accessor", "&length", "has", "each", "on", "Sort", "Filter", "&keys");
     self.Accessor._cls = $L.Accessor;
-    Object.defineProperty(self.Accessor, "keys", {
-      get: function(){ return Object.keys(_dict); }
-    });
-    Object.defineProperty(self.Accessor, "len", {
-      get: function(){ return _length; }
-    });
-    
+
     Object.freeze(self.Accessor);
     Object.freeze(self);
 
     return self;
   });
 
-  $L.set("Accessor", function(accessor){
+  $L.set($L, "Accessor", function(accessor){
     return accessor.Accessor;
   });
 });

@@ -1,77 +1,58 @@
 (function(){
   var _Person = function(id, name, role, active){
-    var self = Lapiz.Object();
-    var p = Lapiz.parse;
-
-    self.priv.properties({
-      "id": p.int,
+    this.properties({
+      "id": "int",
       "name": "string",
-      "role": p.string,
-      "active": p.bool,
-    }, self.priv.argDict());
-
-    return self;
+      "role": "string",
+      "active": "bool",
+    }, Lapiz.argDict());
   };
 
-   Lapiz.Test("Class/ArgDict", function(t){
+   Lapiz.Test("Class/ArgDict", ["Event/"], function(t){
     var Person = Lapiz.Class(function(id, name){
-      var self = Lapiz.Object();
-      var argDict = self.priv.argDict();
+      var argDict = Lapiz.argDict();
 
       argDict['name'] === "Adam" || t.error("Name is wrong");
       argDict['id'] === 5        || t.error("Id is wrong");
-      
-      return self;
     });
 
     Person(5, "Adam");
   });
 
-  Lapiz.Test("Class/Lock", function(t){
+  Lapiz.Test("Class/SetMany", ["Event/", "Class/ArgDict"], function(t){
     var Person = Lapiz.Class(_Person);
 
     var name, role, active;
     var person = Person(6, "Adam", "admin", false);
 
-    person.hasOwnProperty("priv")  || t.error("'priv' was expected");
-    person.priv.lock();
-    !person.hasOwnProperty("priv") || t.error("'priv' was expected");
-
-    
-  });
-
-  Lapiz.Test("Class/SetAll", function(t){
-    var Person = Lapiz.Class(_Person);
-
-    var name, role, active;
-    var person = Person(6, "Adam", "admin", false);
-
-    person.priv.setAll({
-      name: "Lauren",
-      role: "editor",
-      active: true
+    person.setMany({
+      "name": "Lauren",
+      "role": "editor",
+      "active": true
     });
+    test  = person;
+    person = person.pub;
 
     person.name === "Lauren" || t.error("Name was not set correctly");
     person.role === "editor" || t.error("Role was not set correctly");
     person.active === true   || t.error("Active was not set correctly");
   });
 
-  Lapiz.Test("Class/ChangeOnSetAll", function(t){
+  Lapiz.Test("Class/ChangeOnSetAll", ["Event/", "Class/SetMany"], function(t){
     var Person = Lapiz.Class(_Person);
 
     var name, role, active;
     var person = Person(6, "Adam", "admin", false);
     var changeCounter = 0;
 
-    person.on.change(function(person){
+    person.pub.on.change(function(person){
       name = person.name;
       role = person.role;
       active = person.active;
       changeCounter += 1;
     });
 
-    person.priv.setAll({
+    person.setMany({
       name: "Lauren",
       role: "editor",
       active: true
@@ -83,10 +64,10 @@
     changeCounter === 1 || t.error("person.on.change should have run 1 time, ran " + changeCounter + " times");
   });
 
-  Lapiz.Test("Class/ChangeOnSet", function(t){
+  Lapiz.Test("Class/ChangeOnSet", ["Event/"], function(t){
     var Person = Lapiz.Class(_Person);
 
-    var person = Person(6, "Adam", "admin", false);
+    var person = Person(6, "Adam", "admin", false).pub;
     var name = person.name;
     var role = person.role;
     var active = person.active;
@@ -94,7 +75,7 @@
       name: false,
       role: false,
       active: false
-    }
+    };
 
     person.on.change(function(person){
       if (name !== person.name){
@@ -124,51 +105,21 @@
   });
 })();
 
-Lapiz.Test("Class/GetterSetterArray", function(t){
+Lapiz.Test("Class/GetterSetterObj", ["Event/"], function(t){
   var PositiveInt = Lapiz.Class(function(val){
-    var self = Lapiz.Object();
-    var priv = self.priv;
-    var p = Lapiz.parse;
-
-    self.priv.properties({
-      "val": [
-        function(v){
-          return Math.abs(v);
-        },
-        function(){
-          return priv.attr.val;
-        }
-      ]
-    }, self.priv.argDict());
-
-    return self; 
-  });
-
-  var p5 = PositiveInt(5);
-  var p6 = PositiveInt(-6);
-
-  p5.val === 5 || t.error("Expected 5, got " + p5.val);
-  p6.val === 6 || t.error("Expected 6");
-});
-
-Lapiz.Test("Class/GetterSetterObj", function(t){
-  var PositiveInt = Lapiz.Class(function(val){
-    var self = Lapiz.Object();
-    var priv = self.priv;
-    var p = Lapiz.parse;
-
-    self.priv.properties({
+    var self = this;
+    self.properties({
       "val": {
-        set: function(v){
+        "set": function(v){
           return Math.abs(v);
         },
-        get: function(){
-          return priv.attr.val;
+        "get": function(){
+          return self.attr.val;
         }
       }
-    }, self.priv.argDict());
+    }, Lapiz.argDict());
 
-    return self; 
+    return self.pub;
   });
 
   var p5 = PositiveInt(5);
@@ -178,24 +129,22 @@ Lapiz.Test("Class/GetterSetterObj", function(t){
   p6.val === 6 || t.error("Expected 6");
 });
 
-Lapiz.Test("Class/GetterObj", function(t){
+Lapiz.Test("Class/GetterObj", ["Event/"], function(t){
   var RelationalKey = Lapiz.Class(function(valKey){
     var self = Lapiz.Object();
-    var priv = self.priv;
-    var p = Lapiz.parse;
     var _strIndex = ["apple","bannana","cantaloup"];
 
-    self.priv.properties({
-      "valKey": p.int,
+    self.properties({
+      "valKey": "int",
       "valStr": {
         get: function(){
-          return _strIndex[priv.attr.valKey];
+          return _strIndex[self.attr.valKey];
         }
       }
-    }, self.priv.argDict());
+    }, Lapiz.argDict());
 
-    return self; 
-  });
+    return self.pub;
+  }, true);
 
   var r2 = RelationalKey(2);
   var r0 = RelationalKey(0);
@@ -205,35 +154,17 @@ Lapiz.Test("Class/GetterObj", function(t){
   r0.valStr === "apple" || t.error("r0 error");
 });
 
-var Foo;
-
-Lapiz.Test("Class/Constructor", function(t){
-  var Person = Lapiz.Constructor(function(id, name, role, active){
-    this.priv.properties({
-      id     : "int",
-      name   : "string",
-      role   : "string",
-      active : "bool",
-    }, this.priv.argDict());
-  });
-
-  Foo = Person;
-
-  p = Person("1", "Adam", "admin", true);
-
-  typeof p.id === "number" || t.error("Expected a number");
-});
-
-Lapiz.Test("Class/OverrideSetter", function(t){
-  var Test = Lapiz.Constructor(function(){
-    this.priv.properties({
-      test: function(val){
+Lapiz.Test("Class/OverrideSetter", ["Event/"], function(t){
+  var Test = Lapiz.Class(function(){
+    this.properties({
+      "test": function(val){
         if (val === "skip"){
           this.set = false;
         }
         return val;
       }
-    }, {test: "test"});
+    }, {"test": "test"});
+    return this.pub;
   });
 
   var test = Test();
@@ -245,18 +176,64 @@ Lapiz.Test("Class/OverrideSetter", function(t){
   test.test === "test2" || t.error("Expected test2");
 });
 
-Lapiz.Test("Class/ConstructorProperties", function(t){
-  var PersonProperties = {
-    id     : "int",
-    name   : "string",
-    role   : "string",
-    active : "bool",
-  };
-  var Person = Lapiz.Constructor(function(id, name, role, active){
-    this.priv.setAll(this.priv.argDict());
-  },PersonProperties);
+Lapiz.Test("Class/Getter", ["Event/"], function(t){
+  var Person = Lapiz.Class(function(id, name, role, active){
+    this.properties({
+      id     : "int",
+      name   : "string",
+      role   : "string",
+      active : "bool",
+    }, Lapiz.argDict());
+
+    this.getter(function foo(){
+      return "foo " + this.id;
+    });
+    return this.pub;
+  });
 
   p = Person("1", "Adam", "admin", true);
 
-  typeof p.id === "number" || t.error("Expected a number");
+  p.foo === "foo 1" || t.error("Expected 'foo 1'");
+});
+
+Lapiz.Test("Class/Method", ["Event/"], function(t){
+  var Person = Lapiz.Class(function(id, name, role, active){
+    this.properties({
+      id     : "int",
+      name   : "string",
+      role   : "string",
+      active : "bool",
+    }, Lapiz.argDict());
+
+    var self = this.pub;
+    this.method(function foo(arg){
+      return arg + " foo " + self.id;
+    });
+    return self;
+  });
+
+  p = Person("1", "Adam", "admin", true);
+  var indirect = p.foo; //despite indirect call 'this' is consistant within method
+
+  p.foo("A")    === "A foo 1" || t.error("Expected 'A foo 1'");
+  indirect("B") === "B foo 1" || t.error("Expected 'B foo 1'");
+});
+
+Lapiz.Test("Class/ObjectConstructor", ["Event/"], function(t){
+  var Foo = Lapiz.Object(function(){
+    this.properties({
+      "id":"int"
+    },{
+      "id": 12
+    })
+
+    this.method(function bar(){
+      return "bar";
+    }, true);
+  }).pub;
+
+  Foo.bar() === "bar" || t.error("Expected 'bar'");
+  Foo.id === 12       || t.error("Expected 12");
+  Foo.id = "23.3"
+  Foo.id === 23       || t.error("Expected 23");
 });

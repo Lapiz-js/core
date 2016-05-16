@@ -1,5 +1,5 @@
 Lapiz.Module("Filter", function($L){
-  $L.Filter = function(accessor, filterOrAttr, val){
+  $L.set($L, "Filter", function(accessor, filterOrAttr, val){
     var _index = [];
     var self = function(key){
       if (_index.indexOf(key) > -1) { return accessor(key); }
@@ -7,7 +7,7 @@ Lapiz.Module("Filter", function($L){
     self._cls = $L.Filter;
 
     var filterFn = filterOrAttr;
-    if (typeof(filterOrAttr) === "string" && val !== undefined){
+    if ($L.typeCheck.string(filterOrAttr) && val !== undefined){
       filterFn = function(key, accessor){
         return accessor(key)[filterOrAttr] === val;
       };
@@ -28,11 +28,12 @@ Lapiz.Module("Filter", function($L){
     self.has = function(key){
       return _index.indexOf(key.toString()) > -1;
     };
-    Object.defineProperty(self, "keys",{
-      get: function(){ return _index.slice(0); }
+
+    $L.Map.getter(self, function keys(){
+      return _index.slice(0);
     });
-    Object.defineProperty(self, "len",{
-      get: function(){ return _index.length; }
+    $L.Map.getter(self, function length(){
+      return _index.length;
     });
 
     self.each = function(fn){
@@ -45,9 +46,9 @@ Lapiz.Module("Filter", function($L){
     };
 
     self.on = $L.Map();
-    $L.Event.LinkProperty(self.on, "insert", _insertEvent);
-    $L.Event.LinkProperty(self.on, "change", _changeEvent);
-    $L.Event.LinkProperty(self.on, "remove", _removeEvent);
+    $L.Event.linkProperty(self.on, "insert", _insertEvent);
+    $L.Event.linkProperty(self.on, "change", _changeEvent);
+    $L.Event.linkProperty(self.on, "remove", _removeEvent);
     Object.freeze(self.on);
 
     var inFn = function(key, accessor){
@@ -117,6 +118,7 @@ Lapiz.Module("Filter", function($L){
       });
     };
 
+    //todo: potential conflict if filter function is set using filter.func = function(){...}
     if (filterFn.on !== undefined && filterFn.on.change !== undefined){
       filterFn.on.change(self.ForceRescan);
     }
@@ -132,5 +134,5 @@ Lapiz.Module("Filter", function($L){
 
     Object.freeze(self);
     return self;
-  };
+  });
 });

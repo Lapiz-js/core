@@ -1,19 +1,16 @@
 (function(){
   var _Person = function(id, name, role, active){
-    var self = Lapiz.Object();
-    var p = Lapiz.parse;
+    this.properties({
+      "id"    : "int",
+      "name"  : "string",
+      "role"  : "string",
+      "active": "bool",
+    }, Lapiz.argDict());
 
-    self.priv.properties({
-      "id"    : p.int,
-      "name"  : p.string,
-      "role"  : p.string,
-      "active": p.bool,
-    }, self.priv.argDict());
-
-    return self;
+    return this.pub;
   };
 
-  Lapiz.Test("Index/Index", function(t){
+  Lapiz.Test("Index/Index", ["Event/"], function(t){
     var Person = Lapiz.Class(_Person);
 
     Lapiz.Index(Person);
@@ -40,7 +37,7 @@
     admins[70] === undefined || t.error("Did not expected id 70 in list");
   });
 
-  Lapiz.Test("Index/Filter", function(t){
+  Lapiz.Test("Index/Filter", ["Event/"], function(t){
     var Person = Lapiz.Class(_Person);
 
     Lapiz.Index(Person);
@@ -62,7 +59,7 @@
     !activeAdmins.has(9)  || t.error("Composite should not return entity 9");
   });
 
-  Lapiz.Test("Index/IndexChangeEvent", function(t){
+  Lapiz.Test("Index/IndexChangeEvent", ["Event/"], function(t){
     var Person = Lapiz.Class(_Person);
     var name;
 
@@ -115,7 +112,7 @@
     !admins.hasOwnProperty("isProtected") || t.error("Should not be able to modify admins")
   });
 
-  Lapiz.Test("Index/OnInsert", function(t){
+  Lapiz.Test("Index/OnInsert", ["Event/"], function(t){
     var Person = Lapiz.Class(_Person);
     var flag = false;
 
@@ -234,39 +231,29 @@
     flag || t.error("On.change fired");
   });
 
-  Lapiz.Test("Index/Constructor", ["Index/Filter"], function(t){
-    var Person = Lapiz.Constructor(function(id, name, role, active){
-      this.priv.properties({
-        id     : "int",
-        name   : "string",
-        role   : "string",
-        active : "bool",
-      }, this.priv.argDict());
-    });
-
-    var adam = Person(6, "Adam", "admin", true);
-    adam.name === "Adam" || t.error("Expected 'Adam'");
-    Person.on || t.error("Class does not have 'on' field");
-  });
-
   Lapiz.Test("Index/Relational", ["Index/Filter"], function(t){
-    var One = Lapiz.Constructor(function(id, name){
-      var p = Lapiz.parse;
-      this.priv.properties({
-        "id"    : p.int,
-        "name"  : p.string
-      }, this.priv.argDict());
+    var One = Lapiz.Class(function(id, name){
+      this.properties({
+        "id"    : "int",
+        "name"  : "string"
+      }, Lapiz.argDict());
+      return this.pub;
     });
 
     Lapiz.Index(One);
 
-    var Many = Lapiz.Constructor(function(id, name, parent_id){
-      var p = Lapiz.parse;
-      this.priv.properties({
-        "id"        : p.int,
-        "name"      : p.string,
-        "parent_id" : p.relational(p.int, this, "parent", One.get),
-      }, this.priv.argDict());
+    var Many = Lapiz.Class(function(id, name, parent_id){
+      this.properties({
+        "id"        : "int",
+        "name"      : "string",
+        "parent_id" : "int",
+      }, Lapiz.argDict());
+
+      var self = this.pub;
+      this.getter(function parent(){
+        return One.get(self.parent_id);
+      });
+      return self;
     });
     Lapiz.Index(Many);
 
@@ -283,6 +270,6 @@
     Many.get(4).parent_id   === 2                 || t.error("Expected '2'");
     Many.get(4).parent                            || t.error("Expected field parent");
     Many.get(4).parent.name === "Presidents Quiz" || t.error("Expected 'Presidents Quiz'");
-    
+
   });
 })();
