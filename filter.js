@@ -1,4 +1,7 @@
 Lapiz.Module("Filter", function($L){
+
+  // > Lapiz.Filter(accessor, filterFunc)
+  // > Lapiz.Filter(accessor, attribute, val)
   $L.set($L, "Filter", function(accessor, filterOrAttr, val){
     var _index = [];
     var self = function(key){
