@@ -1,6 +1,6 @@
 Lapiz.Module("Objects", ["Events"], function($L){
   function _getter(self, funcOrProp){
-    if ($L.typeCheck.function(funcOrProp)) { return funcOrProp; }
+    if ($L.typeCheck.func(funcOrProp)) { return funcOrProp; }
     if ($L.typeCheck.string(funcOrProp)) { return function(){ return self.attr[funcOrProp]; }; }
   }
 
@@ -127,7 +127,7 @@ Lapiz.Module("Objects", ["Events"], function($L){
         "name": "string",
         "role": "string"
       });
-      this.method(this.setMany);
+      this.meth(this.setMany);
     }).pub;
     obj.setMany({
       "id":12,
@@ -192,7 +192,7 @@ Lapiz.Module("Objects", ["Events"], function($L){
 
         if (val === undefined || val === null){
           throw new Error("Invalid value for '" + property + "'");
-        } else if ($L.typeCheck.function(val)|| $L.typeCheck.string(val)){
+        } else if ($L.typeCheck.func(val)|| $L.typeCheck.string(val)){
           desc.set = _setter(self, property, val);
           desc.get = _getter(self, property);
         } else if (val.set !== undefined || val.get !== undefined) {
@@ -217,13 +217,13 @@ Lapiz.Module("Objects", ["Events"], function($L){
       $L.Map.getter(self.pub, getterFn);
     };
 
-    // > lapizObject.method(fn)
+    // > lapizObject.meth(fn)
     // Creates a method in the public namespace.
-    self.method = function(fn){
-      $L.Map.method(self.pub, fn);
+    self.meth = function(fn){
+      $L.Map.meth(self.pub, fn);
     };
 
-    if ($L.typeCheck.function(constructor)){
+    if ($L.typeCheck.func(constructor)){
       constructor.apply(self);
     }
 
@@ -242,7 +242,7 @@ Lapiz.Module("Objects", ["Events"], function($L){
   }
   foo('do','re','mi'); // logs {'x':'do', 'y':'re', 'z':'mi'}
   */
-  $L.Map.method($L, function argDict(){
+  $L.Map.meth($L, function argDict(){
     var args = arguments.callee.caller.arguments;
     var argNames = (arguments.callee.caller + "").match(/\([^)]*\)/g);
     var dict = {};

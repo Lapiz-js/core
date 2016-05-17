@@ -206,7 +206,7 @@ Lapiz.Test("Class/Method", ["Event/"], function(t){
     }, Lapiz.argDict());
 
     var self = this.pub;
-    this.method(function foo(arg){
+    this.meth(function foo(arg){
       return arg + " foo " + self.id;
     });
     return self;
@@ -227,7 +227,7 @@ Lapiz.Test("Class/ObjectConstructor", ["Event/"], function(t){
       "id": 12
     })
 
-    this.method(function bar(){
+    this.meth(function bar(){
       return "bar";
     }, true);
   }).pub;

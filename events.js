@@ -40,7 +40,7 @@ Lapiz.Module("Events", ["Collections"], function($L){
     // The event.fire method will call all functions that have been registered
     // with the event. The arguments that are passed into fire will be passed
     // into the registered functions.
-    $L.Map.method(event, function fire(){
+    $L.Map.meth(event, function fire(){
       if (!event.fire.enabled) { return event; }
       var i;
       var l = _listeners.length;
@@ -79,7 +79,7 @@ Lapiz.Module("Events", ["Collections"], function($L){
     var facade = $L.Map();
 
     // > singleEvent.register
-    $L.Map.method(facade, function register(fn){
+    $L.Map.meth(facade, function register(fn){
       if (_hasFired){
         fn.apply(this, _args);
       } else {
@@ -88,13 +88,13 @@ Lapiz.Module("Events", ["Collections"], function($L){
     });
 
     // > singleEvent.register.deregister
-    $L.Map.method(facade.register, function deregister(fn){
+    $L.Map.meth(facade.register, function deregister(fn){
       if (_hasFired) { return; }
       _event.register.deregister(fn);
     });
 
     // > singleEvent.fire
-    $L.Map.method(facade, function fire(){
+    $L.Map.meth(facade, function fire(){
       if (_hasFired) { return; }
       _hasFired = true;
       _args = arguments;

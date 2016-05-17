@@ -12,15 +12,15 @@ Lapiz.Module("Collections", function($L){
   };
   $L.set($L, "Map", Map);
 
-  // > Lapiz.Map.method(obj, namedFunc)
+  // > Lapiz.Map.meth(obj, namedFunc)
   // Attaches a method to an object. The method must be a named function.
   /* >
   var x = Lapiz.Map();
-  Lapiz.Map.method(x, function foo(){...});
+  Lapiz.Map.meth(x, function foo(){...});
   x.foo(); //calls foo
   */
-  $L.set(Map, "method", function(obj, fn){
-    $L.typeCheck.function(fn, "Expected function");
+  $L.set(Map, "meth", function(obj, fn){
+    $L.typeCheck.func(fn, "Expected function");
     $L.assert(fn.name !== "", "Require named function for method");
     $L.set(obj, fn.name, fn);
   });
@@ -29,14 +29,14 @@ Lapiz.Module("Collections", function($L){
   // Attaches a setter method to an object. The method must be a named function.
   /* >
   var x = Lapiz.Map();
-  Lapiz.Map.method(x, function foo(val){...});
+  Lapiz.Map.meth(x, function foo(val){...});
 
   //these two calls are equivalent
   x.foo("bar");
   x.foo = "bar";
   */
-  Map.method(Map, function setterMethod(obj, fn){
-    $L.typeCheck.function(fn, "Expected function for setterMethod");
+  Map.meth(Map, function setterMethod(obj, fn){
+    $L.typeCheck.func(fn, "Expected function for setterMethod");
     $L.assert(fn.name !== "", "Require named function for setterMethod");
     Object.defineProperty(obj, fn.name, {
       "get": function(){ return fn; },
@@ -46,7 +46,7 @@ Lapiz.Module("Collections", function($L){
 
   // > Lapiz.Map.prop(obj, name, desc)
   // Just a wrapper around Object.defineProperty
-  Map.method(Map, function prop(obj, name, desc){
+  Map.meth(Map, function prop(obj, name, desc){
     Object.defineProperty(obj, name, desc);
   });
 
@@ -63,8 +63,8 @@ Lapiz.Module("Collections", function($L){
   console.log(x.foo); //0
   console.log(x.foo); //1
   */
-  Map.method(Map, function getter(obj, fn){
-    $L.typeCheck.function(fn, "Expected function for getter");
+  Map.meth(Map, function getter(obj, fn){
+    $L.typeCheck.func(fn, "Expected function for getter");
     $L.assert(fn.name !== "", "Require named function for getter");
     Object.defineProperty(obj, fn.name, {"get": fn,} );
   });
@@ -99,8 +99,8 @@ Lapiz.Module("Collections", function($L){
   console.log(x.foo); // value will still be 12
 
   */
-  Map.method(Map, function setterGetter(obj, name, setter, getter){
-    $L.typeCheck.function(setter, "Expected function for setterGetter");
+  Map.meth(Map, function setterGetter(obj, name, setter, getter){
+    $L.typeCheck.func(setter, "Expected function for setterGetter");
     var val;
     var desc = {};
     if (getter === undefined){
@@ -139,7 +139,7 @@ Lapiz.Module("Collections", function($L){
   B.y = "Test";
   console.log(A.y); // Test
   */
-  Map.method(Map, function copyProps(copyTo, copyFrom){
+  Map.meth(Map, function copyProps(copyTo, copyFrom){
     //todo: write tests for this
     var i = 2;
     var l = arguments.length;
@@ -173,7 +173,7 @@ Lapiz.Module("Collections", function($L){
   /* >
   var x = Lapiz.Namespace();
   x.set("foo", "bar");
-  x.method(function sayHello(name){
+  x.meth(function sayHello(name){
     console.log("Hello, "+name);
   });
   console.log(x.namespace.foo); // bar
@@ -184,7 +184,7 @@ Lapiz.Module("Collections", function($L){
   /* >
   var x = Lapiz.Namespace(function(){
     this.set("foo", "bar");
-    this.method(function sayHello(name){
+    this.meth(function sayHello(name){
       console.log("Hello, "+name);
     });
   });
@@ -194,23 +194,23 @@ Lapiz.Module("Collections", function($L){
   */
   // * namespace.set(name, value)
   // * namespace.prop(name, desc)
-  // * namespace.method(namedFunc)
+  // * namespace.meth(namedFunc)
   // * namespace.setterMethod(namedSetterFunc)
   // * namespace.getter(namedGetterFunc)
   // * namespace.setterGetter(name, setter, getter)
   // * namespace.setterGetter(name, setter)
-  Map.method($L, function Namespace(fn){
+  Map.meth($L, function Namespace(fn){
     var self = $L.Map();
     self.namespace = $L.Map();
 
-    Map.method(self, function set(name, value){Object.defineProperty(self.namespace, name, { value: value });});
-    Map.method(self, function prop(name, desc){Object.defineProperty(self.namespace, name, desc);});
-    Map.method(self, function method(fn){Map.method(self.namespace, fn);});
-    Map.method(self, function setterMethod(fn){Map.setterMethod(self.namespace, fn);});
-    Map.method(self, function getter(fn){Map.getter(self.namespace, fn);});
-    Map.method(self, function setterGetter(name, setter, getter){Map.setterGetter(self.namespace, name, setter, getter);});
+    Map.meth(self, function set(name, value){Object.defineProperty(self.namespace, name, { value: value });});
+    Map.meth(self, function prop(name, desc){Object.defineProperty(self.namespace, name, desc);});
+    Map.meth(self, function meth(fn){Map.meth(self.namespace, fn);});
+    Map.meth(self, function setterMethod(fn){Map.setterMethod(self.namespace, fn);});
+    Map.meth(self, function getter(fn){Map.getter(self.namespace, fn);});
+    Map.meth(self, function setterGetter(name, setter, getter){Map.setterGetter(self.namespace, name, setter, getter);});
 
-    if ($L.typeCheck.function(fn)){
+    if ($L.typeCheck.func(fn)){
       fn.apply(self);
       return self.namespace;
     }
@@ -227,7 +227,7 @@ Lapiz.Module("Collections", function($L){
   Lapiz.remove(arr,1);
   console.log(arr); //[3,4,1,5,9]
   */
-  Map.method($L, function remove(arr, el, start){
+  Map.meth($L, function remove(arr, el, start){
     var i = arr.indexOf(el, start);
     if (i > -1) { arr.splice(i, 1); }
   });
@@ -253,7 +253,7 @@ Lapiz.Module("Collections", function($L){
     console.log(key, val);
   });
   */
-  Map.method($L, function each(obj, fn){
+  Map.meth($L, function each(obj, fn){
     var i;
     if (obj instanceof Array){
       var l = obj.length;
@@ -275,7 +275,7 @@ Lapiz.Module("Collections", function($L){
   // results can be unpredictable. This primarily provided as a tool for
   // interfacing with other libraries and frameworks. Use the accessor interface
   // whenever possible.
-  Map.method($L, function ArrayConverter(accessor){
+  Map.meth($L, function ArrayConverter(accessor){
     var arr = [];
     var index = [];
     accessor.each(function(i, obj){

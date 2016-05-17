@@ -17,7 +17,8 @@ Lapiz.Module("Parser", function($L){
   // If rad is not defined it will default to 10. This is mostly a wrapper
   // around parseInt, however if val is a boolean it will reurn eitehr 1
   // or 0.
-  $L.Map.method($L.parse, function int(val,rad){
+  $L.set($L.parse, "int", function(val,rad){
+    //can't use $L.Map.meth because "int" is reserve word
     if (val === true){
       return 1;
     } else if (val === false){
@@ -30,11 +31,11 @@ Lapiz.Module("Parser", function($L){
   // > Lapiz.parse.string
   // If val is null or undefined, returns an empty stirng. If val
   // is a string, it is returned, if it's a number it's converted
-  // to a string. If val is an object that has a .str() method, 
+  // to a string. If val is an object that has a .str() method,
   // that will be used, if it doesn't have .str but it does have
   // .toString, that will be used. As a last resort it will be
   // concatted with an empty string.
-  $L.Map.method($L.parse, function string(val){
+  $L.Map.meth($L.parse, function string(val){
     if (val === undefined || val === null) { return ""; }
     var type = typeof(val);
     if (type === "string") { return val; }
@@ -50,29 +51,29 @@ Lapiz.Module("Parser", function($L){
     }
     return "" + val;
   });
-  
+
   // > Lapiz.parse.bool(val)
   // Converts val to a bool
-  $L.Map.method($L.parse, function bool(val){ return !!val; });
-  
+  $L.Map.meth($L.parse, function bool(val){ return !!val; });
+
   // > Lapiz.parse.number(val)
   // Converts val to a number. This is a wrapper around parseFloat.
-  $L.Map.method($L.parse, function number(val){ return parseFloat(val); });
-  
+  $L.Map.meth($L.parse, function number(val){ return parseFloat(val); });
+
   // Lapiz.parse.object(val)
   // This is just a pass through function, not a true parser. It can
   // be useful for object properties.
-  $L.Map.method($L.parse, function object(obj){ return obj; });
-  
+  $L.Map.meth($L.parse, function object(obj){ return obj; });
+
   // > Lapiz.parse.array(parser)
-  // This takes a parser or a string (which will be resolved agains Lapiz.parse) 
+  // This takes a parser or a string (which will be resolved agains Lapiz.parse)
   // and returns an array parser.
   /* >
   var arrIntParser = Lapiz.parse.array("int");
   console.log(arrIntParser([3.14, "12.34", true]); // [3, 12, 1]
   console.log(arrIntParser("22.22"); // [22]
   */
-  $L.Map.method($L.parse, function array(parser){
+  $L.Map.meth($L.parse, function array(parser){
     parser = resolveParser(parser);
     return function(arr){
       if (Array.isArray(arr)){

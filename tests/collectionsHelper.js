@@ -7,7 +7,7 @@ Lapiz.Test("CollectionsHelper/Namespace-Set", function(t){
 
 Lapiz.Test("CollectionsHelper/Namespace-Method", function(t){
   var ns = Lapiz.Namespace();
-  ns.method(function foo(){
+  ns.meth(function foo(){
     return "bar";
   });
 
@@ -59,7 +59,7 @@ Lapiz.Test("CollectionsHelper/ObjectEach", function(t){
 
 Lapiz.Test("CollectionsHelper/NamespaceConstructor", function(t){
   var foo = Lapiz.Namespace(function(){
-    this.method(function hello(name){
+    this.meth(function hello(name){
       return "Hello, "+name;
     });
     this.set("foo", "bar");
@@ -72,7 +72,7 @@ Lapiz.Test("CollectionsHelper/NamespaceConstructor", function(t){
 Lapiz.Test("CollectionsHelper/Method", function(t){
   var obj = {};
   var flag = "failed";
-  Lapiz.Map.method(obj, function foo(val){
+  Lapiz.Map.meth(obj, function foo(val){
     flag = val;
   });
 
@@ -180,12 +180,12 @@ Lapiz.Test("TypeCheck/Helpers", function(t){
   var arr = [3,1,4];
   var num = 12;
 
-  Lapiz.typeCheck.function(fn) || t.error("Expected true");
+  Lapiz.typeCheck.func(fn) || t.error("Expected true");
   Lapiz.typeCheck.array(arr)   || t.error("Expected true");
   Lapiz.typeCheck.string(str)  || t.error("Expected true");
   Lapiz.typeCheck.number(num)  || t.error("Expected true");
 
-  !Lapiz.typeCheck.function(arr) || t.error("Expected false");
+  !Lapiz.typeCheck.func(arr) || t.error("Expected false");
   !Lapiz.typeCheck.array(fn)     || t.error("Expected false");
   !Lapiz.typeCheck.string(fn)    || t.error("Expected false");
   !Lapiz.typeCheck.number(fn)    || t.error("Expected false");
