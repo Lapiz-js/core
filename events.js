@@ -20,7 +20,8 @@ Lapiz.Module("Events", ["Collections"], function($L){
 
     // > event.register(fn)
     // > event.register = fn
-    // The event.register method takes a function. All registered functions will be called when the event fires.
+    // The event.register method takes a function. All registered functions will
+    // be called when the event fires.
     $L.Map.setterMethod(event, function register(fn){
       _listeners.push(fn);
       return fn;

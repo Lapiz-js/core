@@ -26,11 +26,11 @@ Lapiz.Module("Objects", ["Events"], function($L){
     };
   }
 
-  // > Lapiz.Object();
-  // > Lapiz.Object(constructor);
+  // > lapizObject = Lapiz.Object();
+  // > lapizObject = Lapiz.Object(constructor);
   // Creates a Lapiz Object, a structure per-wired for adding events, properties
-  // and methods. If a constructor is supplied, it will be invoked with 'this' set
-  // to the object.
+  // and methods. If a constructor is supplied, it will be invoked with 'this'
+  // set to the object.
   /* >
   var obj = Lapiz.Object();
   obj.properties({
@@ -38,7 +38,7 @@ Lapiz.Module("Objects", ["Events"], function($L){
   });
   obj = obj.pub;
   obj.name = "test";
-  
+
   var obj2 = Lapiz.Object(function(){
     this.properties({
       "name": "string"
@@ -50,19 +50,19 @@ Lapiz.Module("Objects", ["Events"], function($L){
     var self = $L.Map();
     var pub = $L.Map();
 
-    // > object.pub
+    // > lapizObject.pub
     // The public namespace on the object
     self.pub = pub;
 
-    // > object.pub.on
+    // > lapizObject.pub.on
     // Namespace for event registrations
     self.pub.on = $L.Map();
 
-    // > object.fire
+    // > lapizObject.fire
     // Namespace for event fire methods
     self.fire = $L.Map();
 
-    // > object.attr
+    // > lapizObject.attr
     // Namespace for attribute values
     /* >
     var obj = Lapiz.Object(function(){
@@ -78,7 +78,7 @@ Lapiz.Module("Objects", ["Events"], function($L){
     self.attr = $L.Map();
     self._cls = $L.Object;
 
-    // > object.event(name)
+    // > lapizObject.event(name)
     // Creates an event and places the registration method in object.pub.on and
     // the fire method in object.fire
     /* >
@@ -93,17 +93,17 @@ Lapiz.Module("Objects", ["Events"], function($L){
       self.fire[name] = e.fire;
     };
 
-    // > object.pub.on.change
-    // > object.fire.change
+    // > lapizObject.pub.on.change
+    // > lapizObject.fire.change
     // The change event will fire when ever a property is set.
     self.event("change");
 
-    // > object.pub.on.delete
-    // > object.fire.delete
+    // > lapizObject.pub.on.delete
+    // > lapizObject.fire.delete
     // The delete event should be fired if the object is going to be deleted.
     self.event("delete");
 
-    // > object.setMany(collection)
+    // > lapizObject.setMany(collection)
     // Takes a key/value collection (generally a JavaScript object) and sets
     // any properties that match the keys.
     /* >
@@ -150,16 +150,16 @@ Lapiz.Module("Objects", ["Events"], function($L){
       self.fire.change(self.pub);
     };
 
-    // > object.properties(properties)
-    // > object.properties(properties, values)
-    // The properties method is used to attach getter/setter properties to the public
-    // namespace. The attribute that underlies the getter/setter will be attached to
-    // object.attr.
+    // > lapizObject.properties(properties)
+    // > lapizObject.properties(properties, values)
+    // The properties method is used to attach getter/setter properties to the
+    // public namespace. The attribute that underlies the getter/setter will be
+    // attached to object.attr.
     //
-    // If a setter is defined and no getter is defined, a getter will be generated
-    // that returns the attribute value. If a function is given, that will be used as
-    // the setter, if a string is provided, that will be used to get a setter from
-    // Lapiz.parse.
+    // If a setter is defined and no getter is defined, a getter will be
+    // generated that returns the attribute value. If a function is given, that
+    // will be used as the setter, if a string is provided, that will be used to
+    // get a setter from Lapiz.parse.
     /* >
     var obj = Lapiz.Object(function(){
       var self = this;
@@ -211,13 +211,13 @@ Lapiz.Module("Objects", ["Events"], function($L){
       }
     };
 
-    // > object.getter(getterFn)
+    // > lapizObject.getter(getterFn)
     // Creates a getter property in the public namespace.
     self.getter = function(getterFn){
       $L.Map.getter(self.pub, getterFn);
     };
 
-    // > object.method(fn)
+    // > lapizObject.method(fn)
     // Creates a method in the public namespace.
     self.method = function(fn){
       $L.Map.method(self.pub, fn);
@@ -261,8 +261,8 @@ Lapiz.Module("Objects", ["Events"], function($L){
   // Event registration, event will fire whenever a new Lapiz class is defined.
   $L.Event.linkProperty($L.on, "class", _newClassEvent);
 
-  // > Lapiz.Class(constructor)
-  // > Lapiz.Class(constructor, useCustom)
+  // > lapizClass = Lapiz.Class(constructor)
+  // > lapizClass = Lapiz.Class(constructor, useCustom)
   // Used to define a class. Lapiz.on.class will fire everytime a new class
   // is created. The returned constructor will also have an on.create method
   // that will fire everytime a new instance is created.
@@ -309,7 +309,12 @@ Lapiz.Module("Objects", ["Events"], function($L){
       };
     }
 
+    // > lapizClass.on
+    // Namespace for class level events
     ret.on = $L.Map();
+
+    // > lapizClass.on.create
+    // Registration for event that will fire everytime a new instance is created
     $L.Event.linkProperty(ret.on, "create", newInstanceEvent);
 
     _newClassEvent.fire(ret);
