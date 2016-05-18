@@ -56,3 +56,14 @@ Lapiz.Test("Dependency/Remove", function(t){
   Lapiz.Dependency.remove("tests/delete");
   !Lapiz.Dependency.has("tests/delete") || t.error("Did not expected to find 'tests/delete'");
 });
+
+Lapiz.Test("Dependency/NotFound", function(t){
+  var errMsg = false;
+  try {
+    Lapiz.Dependency("foo");
+  } catch(err){
+    errMsg = err.message;
+  }
+
+  errMsg === "Cannot find Dependency foo" || t.error("Expected error: "+errMsg);
+});

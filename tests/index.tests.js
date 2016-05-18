@@ -7,6 +7,11 @@
       "active": "bool",
     }, Lapiz.argDict());
 
+    var self = this;
+    this.meth(function del(){
+      self.fire.delete(self.pub);
+    });
+
     return this.pub;
   };
 
@@ -19,6 +24,31 @@
 
     var person = Person.get(6);
     person.name === "Adam"  || t.error("Expected 'Adam', got " + person.name);
+  });
+
+  Lapiz.Test("Index/PrimaryByString", ["Index/Index"], function(t){
+    var Person = Lapiz.Class(_Person);
+    var errMsg = false;
+    try{
+      Lapiz.Index(Person, ["name"]);
+    } catch(err){
+      errMsg = err.message;
+    }
+
+    errMsg === "Expected a function or string" || t.error("Expected error");
+  });
+
+  Lapiz.Test("Index/CatchBadConstructor", ["Index/Index"], function(t){
+    var Person = Lapiz.Class(_Person);
+
+    Lapiz.Index(Person, "name");
+
+    Person(50, "Stephen", "admin", true);
+    Person(70, "Lauren", "editor", true);
+    Person(60, "Adam", "admin", true);
+
+    var stephen = Person.get("Stephen");
+    stephen.name === "Stephen" || t.error("Expected stephen");
   });
 
   Lapiz.Test("Index/GetByValue", ["Index/Index"], function(t){
@@ -35,6 +65,26 @@
     admins[50] !== undefined || t.error("Expected id 50 in list");
     admins[60] !== undefined || t.error("Expected id 60 in list");
     admins[70] === undefined || t.error("Did not expected id 70 in list");
+  });
+
+  Lapiz.Test("Index/GetByFunc", ["Index/Index"], function(t){
+    var Person = Lapiz.Class(_Person);
+
+    Lapiz.Index(Person);
+
+    Person(5, "Stephen", "admin", false);
+    Person(6, "Adam", "admin", true);
+    Person(7, "Lauren", "editor", true);
+    Person(9, "Alex", "editor", false);
+    Person(15, "Chris", "admin", true);
+
+    var activeAdmins = Person.get(function(person){
+      return person.active && person.role == "admin";
+    });
+
+    Object.keys(activeAdmins).length === 2 || t.error("Wrong number of active admins");
+    activeAdmins[6]  !== undefined         || t.error("Expected id 6 in list");
+    activeAdmins[15] !== undefined         || t.error("Expected id 15 in list");
   });
 
   Lapiz.Test("Index/Filter", ["Event/"], function(t){
@@ -110,6 +160,30 @@
     var admins = Person.Filter("admin", "role");
     admins.isProtected = "testing";
     !admins.hasOwnProperty("isProtected") || t.error("Should not be able to modify admins")
+  });
+
+  Lapiz.Test("Index/All", ["Index/Index"], function(t){
+    var Person = Lapiz.Class(_Person);
+
+    Lapiz.Index(Person);
+
+    Person(5, "Stephen", "admin", true);
+    Person(6, "Adam", "admin", true);
+    Person(7, "Lauren", "editor", true);
+
+    Person.all instanceof Function || t.error("Person.all should be a function")
+  });
+
+  Lapiz.Test("Index/Delete", ["Index/Index"], function(t){
+    var Person = Lapiz.Class(_Person);
+
+    Lapiz.Index(Person);
+
+    Person(5, "Stephen", "admin", true);
+    Person(6, "Adam", "admin", true);
+    Person(7, "Lauren", "editor", true);
+
+    Person.get(5).del();
   });
 
   Lapiz.Test("Index/OnInsert", ["Event/"], function(t){

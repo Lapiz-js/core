@@ -25,7 +25,7 @@ Lapiz.Module("Index", function($L){
         };
       }(primaryFunc);
     } else if ( !(primaryFunc instanceof  Function) ){
-      throw("Expected a function or string");
+      throw new Error("Expected a function or string");
     }
 
     if (domain === undefined) {
