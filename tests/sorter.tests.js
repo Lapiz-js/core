@@ -57,7 +57,7 @@ as well as withing the Lapiz sorter module
   });
 
   Lapiz.Test("Sorter/SortByField", ["Sorter/Sort"], function(t){
-    var nameSorter = Lapiz.Sort(dict, "name");
+    var nameSorter = dict.Sort("name");
     nameSorter.keys[0] === "3" || t.error("First item in list storted by name should be 3, got " + nameSorter.keys[0]);
 
     var fruitSorter = Lapiz.Sort(dict, "fruit");

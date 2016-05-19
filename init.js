@@ -90,11 +90,13 @@ var Lapiz = (function ModuleLoaderModule($L){
     }
   });
 
-  // > Lapiz.Module.Loaded()
+  // > Lapiz.Module.Loaded
   // Returns all the modules that have been loaded
-  $L.Module.Loaded = function(){
-    return Object.keys(_loaded);
-  };
+  Object.defineProperty($L.Module, "Loaded",{
+    "get": function(){
+      return Object.keys(_loaded);
+    }
+  });
   Object.freeze(self.Module);
 
   // > Lapiz.typeCheck(obj, type)

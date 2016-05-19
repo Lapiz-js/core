@@ -45,6 +45,31 @@ Lapiz.Test("CollectionsHelper/ArrayEach", function(t){
   dbl[2] === 8 || t.error('Should have 8');
 });
 
+Lapiz.Test("CollectionsHelper/ArrayEachFind", function(t){
+  var arr = [
+    {
+      "name": "Adam",
+      "role": "admin",
+    }, {
+      "name": "Lauren",
+      "role": "editor",
+    },{
+      "name": "Stephen",
+      "role": "admin",
+    }
+  ];
+
+  var idx = Lapiz.each(arr, function(i,v){
+    return v.name === "Lauren";
+  });
+  idx === 1 || t.error("Expected 1");
+
+  idx = Lapiz.each(arr, function(i,v){
+    return v.name === "Chris";
+  });
+  idx === -1 || t.error("Expected -1");
+});
+
 Lapiz.Test("CollectionsHelper/ObjectEach", function(t){
   var obj = {
     "A":"apple",
@@ -55,6 +80,24 @@ Lapiz.Test("CollectionsHelper/ObjectEach", function(t){
   Lapiz.each(obj, function(k,v){
     obj[k] === v || t.error("Wrong value for key");
   });
+});
+
+Lapiz.Test("CollectionsHelper/ObjectEachFind", function(t){
+  var objs = {
+      "Adam"   : "admin",
+      "Lauren" : "editor",
+      "Stephen": "admin",
+  };
+
+  var name = Lapiz.each(objs, function(name,role){
+    return name === "Lauren";
+  });
+  name === "Lauren" || t.error("Expected 'Lauren', got: "+role);
+
+  name = Lapiz.each(objs, function(i,v){
+    return i === "Chris";
+  });
+  name === undefined || t.error("Expected undefined, got: "+role);
 });
 
 Lapiz.Test("CollectionsHelper/NamespaceConstructor", function(t){
@@ -111,12 +154,18 @@ Lapiz.Test("CollectionsHelper/Getter", function(t){
 Lapiz.Test("CollectionsHelper/SetterGetter", function(t){
   var obj = {};
   Lapiz.Map.setterGetter(obj, "foo", function(i){return parseInt(i);});
+  Lapiz.Map.setterGetter(obj, "money", "number", function(val){
+    return "$" + (val.toFixed(2));
+  });
 
   obj.foo = 12;
   obj.foo === 12 || t.error("Expected 12");
 
   obj.foo = "22";
   obj.foo === 22 || t.error("Expected 22");
+
+  obj.money = 13;
+  obj.money === "$13.00" || t.error ("Expected $13.00 got: " + obj.money);
 });
 
 Lapiz.Test("CollectionsHelper/CopyPropVal", function(t){
@@ -147,47 +196,4 @@ Lapiz.Test("CollectionsHelper/CopyPropRef", function(t){
   objTo.A = "apricot";
   objTo.A === "apricot"   || t.error("Expected 'apricot', got "+objTo.A);
   objFrom.A === "apricot" || t.error("Expected 'apricot', got "+objFrom.A);
-});
-
-Lapiz.Test("TypeCheck/String", function(t){
-  var str = "Hello";
-  Lapiz.typeCheck(str, "string")  || t.error("Expected true");
-  !Lapiz.typeCheck(str, "object") || t.error("Expected false");
-});
-
-Lapiz.Test("TypeCheck/Err", function(t){
-  var str = "Hello";
-  var msgRcv = "";
-  var msg = "This is an expected error";
-  try {
-    Lapiz.typeCheck(str, "force error", "This is an expected error");
-  } catch(err){
-    msgRcv = err.message;
-  }
-
-  msgRcv === msg || t.error("Did not receive expected error");
-});
-
-Lapiz.Test("TypeCheck/Array", function(t){
-  var arr = [];
-  Lapiz.typeCheck(arr, Array)    || t.error("Expected true");
-  !Lapiz.typeCheck(arr, "array") || t.error("Expected false");
-});
-
-Lapiz.Test("TypeCheck/Helpers", function(t){
-  var fn = function(){};
-  var str = "test";
-  var arr = [3,1,4];
-  var num = 12;
-
-  Lapiz.typeCheck.func(fn) || t.error("Expected true");
-  Lapiz.typeCheck.array(arr)   || t.error("Expected true");
-  Lapiz.typeCheck.string(str)  || t.error("Expected true");
-  Lapiz.typeCheck.number(num)  || t.error("Expected true");
-
-  !Lapiz.typeCheck.func(arr) || t.error("Expected false");
-  !Lapiz.typeCheck.array(fn)     || t.error("Expected false");
-  !Lapiz.typeCheck.string(fn)    || t.error("Expected false");
-  !Lapiz.typeCheck.number(fn)    || t.error("Expected false");
-
 });

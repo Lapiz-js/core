@@ -28,7 +28,7 @@ Lapiz.Module("Dictionary", function($L){
     var _changeEvent = Lapiz.Event();
 
     if (val !== undefined) {
-      if (val.hasOwnProperty("each")){
+      if ($L.typeCheck.func(val.each)){
         val.each(function(i, val){
           _dict[i] = val;
           _length += 1;
@@ -152,7 +152,7 @@ Lapiz.Module("Dictionary", function($L){
       var key, i;
       for(i=keys.length-1; i>=0; i-=1){
         key = keys[i];
-        if (fn(key, _dict[key])) { break; }
+        if (fn(key, _dict[key])) { return key; }
       }
     };
 

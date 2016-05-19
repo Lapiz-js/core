@@ -13,10 +13,11 @@ Lapiz.Test("ArrayConverter/ArrayConverter", ["Dictionary/"], function(t){
 
 Lapiz.Test("ArrayConverter/OnInsert", ["Dictionary/"], function(t){
   var dict = Lapiz.Dictionary();
+  var arr = Lapiz.ArrayConverter(dict);
+  arr.length === 0          || t.error("Length is not correct");
   dict("a", "adam");
   dict("b", "bob");
   dict("c", "chris");
-  var arr = Lapiz.ArrayConverter(dict);
 
   arr.length === 3          || t.error("Length is not correct");
   arr.indexOf("adam") > -1  || t.error("Did not find adam in array");

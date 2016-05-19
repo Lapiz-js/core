@@ -96,6 +96,11 @@ Lapiz.Test("Dictionary/Each", ["Event/"], function(t){
   flags.a || t.error("Flag 'a' was not set");
   flags.b || t.error("Flag 'b' was not set");
   flags.c || t.error("Flag 'c' was not set");
+
+  var key = dict.each(function(key, val){
+    return val === "chris";
+  });
+  key === "c" || t.error("Expected 'c'");
 });
 
 Lapiz.Test("Dictionary/Accessor", ["Event/"], function(t){
@@ -181,18 +186,32 @@ Lapiz.Test("Dictionary/Keys", ["Event/"], function(t){
 });
 
 Lapiz.Test("Dictionary/FromArray", ["Event/"], function(t){
-  var arr = ["Apple", "Bannana", "Cantaloup", "Dates", "Elderberry"];
+  var arr = ["Apple", "Banana", "Cantaloup", "Dates", "Elderberry"];
   var dict = Lapiz.Dictionary(arr);
 
   dict(0) === "Apple" || t.error("Key 0 is incorrect");
-  dict(1) === "Bannana" || t.error("Key 1 is incorrect");
+  dict(1) === "Banana" || t.error("Key 1 is incorrect");
+  dict(2) === "Cantaloup" || t.error("Key 2 is incorrect");
+});
+
+Lapiz.Test("Dictionary/FromHasEach", ["Event/"], function(t){
+  var arr = ["Apple", "Banana", "Cantaloup", "Dates", "Elderberry"];
+  arr.each = function(fn){
+    return arr.forEach(function(v,k){
+      return fn(k,v);
+    });
+  }
+  var dict = Lapiz.Dictionary(arr);
+
+  dict(0) === "Apple" || t.error("Key 0 is incorrect");
+  dict(1) === "Banana" || t.error("Key 1 is incorrect");
   dict(2) === "Cantaloup" || t.error("Key 2 is incorrect");
 });
 
 Lapiz.Test("Dictionary/FromJson", ["Event/"], function(t){
   var arr = {
     "a": "Apple",
-    "b": "Bannana",
+    "b": "Banana",
     "c": "Cantaloup",
     "d": "Dates",
     "e": "Elderberry"
@@ -200,6 +219,20 @@ Lapiz.Test("Dictionary/FromJson", ["Event/"], function(t){
   var dict = Lapiz.Dictionary(arr);
 
   dict('a') === "Apple" || t.error("Key 0 is incorrect");
-  dict('b') === "Bannana" || t.error("Key 1 is incorrect");
+  dict('b') === "Banana" || t.error("Key 1 is incorrect");
   dict('c') === "Cantaloup" || t.error("Key 2 is incorrect");
+});
+
+Lapiz.Test("Dictionary/ConstructAccessor", ["Event/"], function(t){
+  var arr = {
+    "a": "Apple",
+    "b": "Banana",
+    "c": "Cantaloup",
+    "d": "Dates",
+    "e": "Elderberry"
+  };
+  var dict = Lapiz.Dictionary(arr);
+  var acc = Lapiz.Accessor(dict);
+
+  acc("b") === "Banana" || t.error("Expected 'Banana'");
 });

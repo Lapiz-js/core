@@ -100,7 +100,10 @@ Lapiz.Module("Collections", function($L){
 
   */
   Map.meth(Map, function setterGetter(obj, name, setter, getter){
-    $L.typeCheck.func(setter, "Expected function for setterGetter");
+    if ($L.typeCheck.string(setter)){
+      setter = $L.parse[setter];
+    }
+    $L.typeCheck.func(setter, "Expected function or string reference to parser for setterGetter (argument 3)");
     var val;
     var desc = {};
     if (getter === undefined){
@@ -109,9 +112,6 @@ Lapiz.Module("Collections", function($L){
       desc.get = function() {
         return getter(val, obj);
       };
-    }
-    if ($L.typeCheck.string(setter)){
-      setter = $L.parse[setter];
     }
     desc.set = function(newVal){
       var setterInterface = {
