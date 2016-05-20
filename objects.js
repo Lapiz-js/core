@@ -21,7 +21,7 @@ Lapiz.Module("Objects", ["Events"], function($L){
         var oldVal = self.attr[field];
         self.attr[field] = val;
         if (setterInterface.fireChange) {self.fire.change(self.pub);}
-        if (typeof setterInterface.event === "function") {event(self, val, oldVal);}
+        if (typeof setterInterface.event === "function") {setterInterface.event(self, val, oldVal);}
       }
     };
   }

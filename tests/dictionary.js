@@ -89,7 +89,7 @@ Lapiz.Test("Dictionary/Each", ["Event/"], function(t){
   dict("b", "bob");
   dict("c", "chris");
 
-  dict.each(function(key, val){
+  dict.each(function(val, key){
     flags[key] = true;
   });
 
@@ -97,7 +97,7 @@ Lapiz.Test("Dictionary/Each", ["Event/"], function(t){
   flags.b || t.error("Flag 'b' was not set");
   flags.c || t.error("Flag 'c' was not set");
 
-  var key = dict.each(function(key, val){
+  var key = dict.each(function(val, key){
     return val === "chris";
   });
   key === "c" || t.error("Expected 'c'");
@@ -196,11 +196,7 @@ Lapiz.Test("Dictionary/FromArray", ["Event/"], function(t){
 
 Lapiz.Test("Dictionary/FromHasEach", ["Event/"], function(t){
   var arr = ["Apple", "Banana", "Cantaloup", "Dates", "Elderberry"];
-  arr.each = function(fn){
-    return arr.forEach(function(v,k){
-      return fn(k,v);
-    });
-  }
+  arr.each = function(fn){arr.forEach(fn);};
   var dict = Lapiz.Dictionary(arr);
 
   dict(0) === "Apple" || t.error("Key 0 is incorrect");

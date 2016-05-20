@@ -37,7 +37,7 @@ Lapiz.Module("Index", function($L){
 
     var _primary = $L.Dictionary();
 
-    // > indexedClass.each( function(key, val))
+    // > indexedClass.each( function(val, key))
     domain.each = _primary.each;
 
     // > indexedClass.has(key)
@@ -82,12 +82,12 @@ Lapiz.Module("Index", function($L){
     domain.get = function(idFuncOrAttr, val){
       var matches = {};
       if (val !== undefined){
-        _primary.each(function(key, obj){
+        _primary.each(function(obj, key){
           if (obj[idFuncOrAttr] === val) { matches[key] = obj; }
         });
         return matches;
       } else if (idFuncOrAttr instanceof Function){
-        _primary.each(function(key, obj){
+        _primary.each(function(obj, key){
           if (idFuncOrAttr(obj)) { matches[key] = obj; }
         });
         return matches;

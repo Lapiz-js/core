@@ -29,15 +29,31 @@ Lapiz.Test("Init/TypeCheck/Helpers", function(t){
   var arr = [3,1,4];
   var num = 12;
 
-  Lapiz.typeCheck.func(fn) || t.error("Expected true");
-  Lapiz.typeCheck.array(arr)   || t.error("Expected true");
-  Lapiz.typeCheck.string(str)  || t.error("Expected true");
-  Lapiz.typeCheck.number(num)  || t.error("Expected true");
+  Lapiz.typeCheck.func(fn)    || t.error("Expected true");
+  Lapiz.typeCheck.array(arr)  || t.error("Expected true");
+  Lapiz.typeCheck.string(str) || t.error("Expected true");
+  Lapiz.typeCheck.number(num) || t.error("Expected true");
 
-  !Lapiz.typeCheck.func(arr) || t.error("Expected false");
-  !Lapiz.typeCheck.array(fn)     || t.error("Expected false");
-  !Lapiz.typeCheck.string(fn)    || t.error("Expected false");
-  !Lapiz.typeCheck.number(fn)    || t.error("Expected false");
+  !Lapiz.typeCheck.func(arr)  || t.error("Expected false");
+  !Lapiz.typeCheck.array(fn)  || t.error("Expected false");
+  !Lapiz.typeCheck.string(fn) || t.error("Expected false");
+  !Lapiz.typeCheck.number(fn) || t.error("Expected false");
+});
+
+Lapiz.Test("Init/TypeCheck/Nested", function(t){
+  var obj = {
+    "foo": "bar",
+    "adam": {
+      "name": "Adam",
+      "on":{
+        "change": function(){}
+      }
+    }
+  };
+
+  Lapiz.typeCheck.nested(obj, "foo", "string") || t.error("obj.foo is a string");
+  !Lapiz.typeCheck.nested(obj, "foo", Lapiz.typeCheck.func) || t.error("obj.foo is not a function");
+  Lapiz.typeCheck.nested(obj, "adam", "on", "change", Lapiz.typeCheck.func) || t.error("obj.foo is not a function");
 });
 
 Lapiz.Test("Init/Modules", function(t){

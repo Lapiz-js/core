@@ -37,7 +37,7 @@ Lapiz.Test("CollectionsHelper/Remove", function(t){
 Lapiz.Test("CollectionsHelper/ArrayEach", function(t){
   var arr = [3,1,4,5,9];
   var dbl = [];
-  Lapiz.each(arr, function(i,v){
+  Lapiz.each(arr, function(v,i){
     dbl.push(v*2);
     arr[i] === v || t.error("Wrong value for index");
   });
@@ -59,12 +59,12 @@ Lapiz.Test("CollectionsHelper/ArrayEachFind", function(t){
     }
   ];
 
-  var idx = Lapiz.each(arr, function(i,v){
+  var idx = Lapiz.each(arr, function(v,i){
     return v.name === "Lauren";
   });
   idx === 1 || t.error("Expected 1");
 
-  idx = Lapiz.each(arr, function(i,v){
+  idx = Lapiz.each(arr, function(v,i){
     return v.name === "Chris";
   });
   idx === -1 || t.error("Expected -1");
@@ -77,7 +77,7 @@ Lapiz.Test("CollectionsHelper/ObjectEach", function(t){
     "C":"cantaloupe",
     "D":"dates",
   };
-  Lapiz.each(obj, function(k,v){
+  Lapiz.each(obj, function(v,k){
     obj[k] === v || t.error("Wrong value for key");
   });
 });
@@ -89,12 +89,12 @@ Lapiz.Test("CollectionsHelper/ObjectEachFind", function(t){
       "Stephen": "admin",
   };
 
-  var name = Lapiz.each(objs, function(name,role){
+  var name = Lapiz.each(objs, function(role, name){
     return name === "Lauren";
   });
   name === "Lauren" || t.error("Expected 'Lauren', got: "+role);
 
-  name = Lapiz.each(objs, function(i,v){
+  name = Lapiz.each(objs, function(v, i){
     return i === "Chris";
   });
   name === undefined || t.error("Expected undefined, got: "+role);

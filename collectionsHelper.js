@@ -50,6 +50,12 @@ Lapiz.Module("Collections", function($L){
     Object.defineProperty(obj, name, desc);
   });
 
+  // > Lapiz.Map.has(obj, field)
+  // Wrapper around Object.hasOwnProperty, useful for maps.
+  Map.meth(Map, function has(obj, field){
+    Object.hasOwnProperty.call(obj, field);
+  });
+
   // > Lapiz.Map.getter(object, namedGetterFunc)
   // Attaches a getter method to an object. The method must be a named function.
   /* >
@@ -232,24 +238,24 @@ Lapiz.Module("Collections", function($L){
     if (i > -1) { arr.splice(i, 1); }
   });
 
-  // > Lapiz.each(collection, fn(key, val))
+  // > Lapiz.each(collection, fn(val, key, collection))
   // Iterates over the collection, calling func(key, val) for each item in the
   // collection. If the collection is an array, key will be the index. If func
   // returns true (or an equivalent value) the Lapiz.each will return the
   // current key allowing each to act as a search.
   /* >
   var arr = [3,1,4,1,5,9];
-  Lapiz.each(arr, function(key,val){
+  Lapiz.each(arr, function(val, key){
     console.log(key, val);
   });
-  var gt4 = Lapiz.each(arr, function(key,val){return val > 4;});
+  var gt4 = Lapiz.each(arr, function(val, key){return val > 4;});
 
   var kv = {
     "A":"apple",
     "B":"banana",
     "C":"cantaloupe"
   };
-  Lapiz.each(kv, function(key,val){
+  Lapiz.each(kv, function(val, key){
     console.log(key, val);
   });
   */
@@ -258,13 +264,13 @@ Lapiz.Module("Collections", function($L){
     if (obj instanceof Array){
       var l = obj.length;
       for(i=0; i<l; i+=1){
-        if (fn(i, obj[i])) {return i;}
+        if (fn(obj[i], i)) {return i;}
       }
       return -1;
     } else {
       var keys = Object.keys(obj);
       for(i=keys.length-1; i>=0; i-=1){
-        if (fn(keys[i], obj[keys[i]])) {return keys[i];}
+        if (fn(obj[keys[i]], keys[i], obj)) {return keys[i];}
       }
     }
   });
@@ -278,9 +284,9 @@ Lapiz.Module("Collections", function($L){
   Map.meth($L, function ArrayConverter(accessor){
     var arr = [];
     var index = [];
-    accessor.each(function(i, obj){
+    accessor.each(function(obj, key){
       arr.push(obj);
-      index.push(i);
+      index.push(key);
     });
 
     accessor.on.insert(function(key, accessor){

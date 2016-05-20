@@ -27,18 +27,35 @@ Lapiz.Test("Event/SingleEvent", ["CollectionsHelper/"], function(t){
   var a = false;
   var b = false;
 
-  e.register(function(){
+  function fnA(){
     a = true;
-  });
+  }
+
+  function fnB(){
+    b = true;
+  }
+
+  e.register(fnA);
+  e.register(fnB);
+  e.register.deregister(fnB);
+
+  e.fire.enabled = false;
+  e.fire();
+  e.fire.enabled === false || t.error("Fire should not be enabled");
+  !a                       || t.error("First observer was called while event was disabled");
+  e.fire.enabled = true;
+  e.fire.enabled === true || t.error("Fire should be enabled");
 
   e.fire();
+  a  || t.error("First observer was not called");
+  !b || t.error("Second observer was called");
+  e.register(fnB);
+  b  || t.error("Second observer was not called");
+  e.register.deregister(fnA);
 
-  e.register(function(){
-    b = true;
-  })
-
-  a || "First observer was not called";
-  b || "Second observer was not called";
+  b = false;
+  e.fire(); // should not fire again
+  !b || t.error("Second observer was called");
 });
 
 Lapiz.Test("Event/length", ["CollectionsHelper/"], function(t){
@@ -48,4 +65,9 @@ Lapiz.Test("Event/length", ["CollectionsHelper/"], function(t){
   e.fire.length === 1 || t.error("Length should be 1");
 });
 
-//todo: singleEventEnabled/disalbed
+Lapiz.Test("Event/LinkProperty", ["CollectionsHelper/"], function(t){
+  var e = Lapiz.Event();
+  var obj = {};
+  Lapiz.Event.linkProperty(obj, "test", e);
+
+});

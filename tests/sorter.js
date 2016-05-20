@@ -39,7 +39,7 @@ as well as withing the Lapiz sorter module
 
     flag = true;
     k = nameSorter.keys;
-    Lapiz.each(['3','4','2','1'], function(i, val){
+    Lapiz.each(['3','4','2','1'], function(val, i){
       flag = flag && val === k[i];
     })
     flag || t.error("Expected" + ['3','4','2','1'] + ", got " + nameSorter.keys);
@@ -50,7 +50,7 @@ as well as withing the Lapiz sorter module
 
     flag = true;
     k = fruitSorter.keys;
-    Lapiz.each(['1','2','3','4'], function(i, val){
+    Lapiz.each(['1','2','3','4'], function(val, i){
       flag = flag && val === k[i];
     })
     flag || t.error("Expected" + ['1','2','3','4'] + ", got " + nameSorter.keys);
@@ -149,7 +149,7 @@ as well as withing the Lapiz sorter module
 
     flag = true;
     k = sorted.keys;
-    Lapiz.each(['b','d','a','c'], function(i, val){
+    Lapiz.each(['b','d','a','c'], function(val, i){
       flag = flag && val === k[i];
     })
     flag || t.error("Expected " + ['b','d','a','c'] + ", got " + k);
@@ -165,7 +165,7 @@ as well as withing the Lapiz sorter module
 
     flag = true;
     k = sorted.keys;
-    Lapiz.each(['d','a','c','b'], function(i, val){
+    Lapiz.each(['d','a','c','b'], function(val, i){
       flag = flag && val === k[i];
     })
     flag || t.error("Expected " + ['d','a','c','b'] + ", got " + k);

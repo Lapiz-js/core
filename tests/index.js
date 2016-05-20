@@ -235,7 +235,7 @@
 
     var c = 0;
     var flag = false;
-    Person.each(function(key, person){
+    Person.each(function(person, key){
       c += 1;
       if (key === "9" && person.name === "Alex") { flag = true; }
     });

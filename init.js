@@ -143,6 +143,24 @@ var Lapiz = (function ModuleLoaderModule($L){
   // will throw err if obj is not an number.
   $L.set($L.typeCheck, "number", function(obj, err){return $L.typeCheck(obj, "number", err)});
 
+  // > Lapiz.typeCheck.nested(obj, nestedFields..., typeCheckFunction)
+  // > Lapiz.typeCheck.nested(obj, nestedFields..., typeCheckFunctionName)
+  // Checks that each nested field exists and that the last field matches the function type.
+  // So this:
+  // > if (collection.key !== undefined && collection.key.on !== undefined && Lapiz.typeCheck.func(collection.key.on.change)){
+  // becomes:
+  // > if (Lapiz.typeCheck.nested(collection, "key", "on", "change", "func")){
+  $L.set($L.typeCheck, "nested", function(){
+    var args = Array.prototype.slice.call(arguments);
+    $L.assert(args.length >= 2, "Lapiz.typeCheck.nested requres at least 2 arguments");
+    var typeCheckFn = args.pop();
+    typeCheckFn = $L.typeCheck.string(typeCheckFn) ? $L.typeCheck[typeCheckFn] : typeCheckFn;
+    $L.typeCheck.func(typeCheckFn, "Last argument to Lapiz.typeCheck.nested must be a function");
+    var obj;
+    for(obj = args.shift(); obj !== undefined && args.length > 0 ; obj = obj[args.shift()]);
+    return typeCheckFn(obj);
+  });
+
   // > Lapiz.assert(bool, err)
   // If bool evaluates to false, an error is thrown with err.
   $L.set($L, "assert", function(bool, err){

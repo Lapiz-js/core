@@ -29,13 +29,13 @@ Lapiz.Module("Dictionary", function($L){
 
     if (val !== undefined) {
       if ($L.typeCheck.func(val.each)){
-        val.each(function(i, val){
-          _dict[i] = val;
+        val.each(function(val, key){
+          _dict[key] = val;
           _length += 1;
         });
       } else {
-        $L.each(val, function(i, val){
-          _dict[i] = val;
+        $L.each(val, function(val, key){
+          _dict[key] = val;
           _length += 1;
         });
       }
@@ -45,22 +45,22 @@ Lapiz.Module("Dictionary", function($L){
     // > dict(key, val)
     // If only key is given, the value currently associated with that key will
     // be returned. If key and val are both given, val is associated with key
-    // and the proper event (change or insert) will fire.
+    // and the proper event (change or insert) will fire. For chaining, the
+    // val is returned when dict is called as a setter.
     var self = function(key, val){
       if (val === undefined){
         return _dict[key];
       }
 
-      var event;
-      if (_dict[key] === undefined){
+      var oldVal = _dict[key];
+      _dict[key] = val;
+      if ( oldVal === undefined){
         _length += 1;
-        event = _insertEvent;
+        _insertEvent.fire(key, self.Accessor);
       } else {
-        event = _changeEvent;
+        _changeEvent.fire(key, self.Accessor, oldVal);
       }
 
-      _dict[key] = val;
-      event.fire(key, self.Accessor);
       return val;
     };
 
@@ -110,7 +110,35 @@ Lapiz.Module("Dictionary", function($L){
     // Event will fire when a new key is added to the dictionary
     $L.Event.linkProperty(self.on, "insert", _insertEvent);
     // > dict.on.change(fn(key, accessor))
-    // Event will fire when a new key has a new value associated with it
+    // Event will fire when a new key has a new value associated with it.
+    //
+    // One poentential "gotcha":
+    /* >
+      var d = Dict();
+      d.on.change = function(key, acc){
+        console.log(key, acc(key));
+      };
+      //assume person is a Lapiz Class
+      d(5, Person(5, "Adam", "admin")); // does not fire change, as it's an insert
+      d(5).role = "editor"; // this will fire person.on.change, but not dict.on.change
+      d(5, Person(5, "Bob", "editor")); // this will fire dict.on.change
+    */
+    // To create a change listener for a class on a dict (or other accessor)
+    /*
+      function chgFn(key, acc){...}
+      d.on.insert(function(key, acc){
+        acc(key).on.change(chgFn);
+      });
+      d.on.remove(function(key, acc){
+        acc(key).on.change(chgFn);
+      });
+      d.on.change(function(key, acc, old){
+        old.on.change.deregister(chgFn);
+        var val = acc(key);
+        val.on.change(chgFn);
+        chgFn(key, acc);
+      });
+    */
     $L.Event.linkProperty(self.on, "change", _changeEvent);
     // > dict.on.remove(fn(key, val, accessor))
     // Event will fire when a key is removed.
@@ -152,7 +180,7 @@ Lapiz.Module("Dictionary", function($L){
       var key, i;
       for(i=keys.length-1; i>=0; i-=1){
         key = keys[i];
-        if (fn(key, _dict[key])) { return key; }
+        if (fn(_dict[key], key)) { return key; }
       }
     };
 
@@ -186,7 +214,7 @@ Lapiz.Module("Dictionary", function($L){
     // * accessor.length
     // * accessor.keys
     // * accessor.has(key)
-    // * accessor.each(fn(key, val))
+    // * accessor.each(fn(val, key))
     // * accessor.on.insert
     // * accessor.on.change
     // * accessor.on.remove

@@ -23,6 +23,7 @@ Lapiz.Module("Events", ["Collections"], function($L){
     // The event.register method takes a function. All registered functions will
     // be called when the event fires.
     $L.Map.setterMethod(event, function register(fn){
+      $L.typeCheck.func(fn, "Event registration requires a function");
       _listeners.push(fn);
       return fn;
     });
@@ -43,9 +44,11 @@ Lapiz.Module("Events", ["Collections"], function($L){
     $L.Map.meth(event, function fire(){
       if (!event.fire.enabled) { return event; }
       var i;
-      var l = _listeners.length;
+      // make a copy in case _listeners changes during fire event
+      var listeners = _listeners.slice(0);
+      var l = listeners.length;
       for(i=0; i<l; i+=1){
-        _listeners[i].apply(this, arguments);
+        listeners[i].apply(this, arguments);
       }
       return event;
     });
@@ -95,7 +98,7 @@ Lapiz.Module("Events", ["Collections"], function($L){
 
     // > singleEvent.fire
     $L.Map.meth(facade, function fire(){
-      if (_hasFired) { return; }
+      if (_hasFired || !_event.fire.enabled) { return; }
       _hasFired = true;
       _args = arguments;
       _event.fire.apply(this, _args);

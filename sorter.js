@@ -51,7 +51,7 @@ Lapiz.Module("Sorter", function($L){
       var l = _index.length;
       for(i=0; i<l; i+=1){
         key = _index[i];
-        if (fn(key, accessor(key))) { break; }
+        if (fn(accessor(key), key)) { break; }
       }
     };
 
@@ -65,7 +65,8 @@ Lapiz.Module("Sorter", function($L){
       set: function(fn){
         _sortFn = fn;
         _index.sort(_sortFn);
-        accessor.each( function(key, _){
+        //todo: this seems shady...
+        accessor.each( function(val, key){
           _changeEvent.fire(key, self);
         });
       }
@@ -80,11 +81,11 @@ Lapiz.Module("Sorter", function($L){
       $L.remove(_index, key.toString());
       _removeEvent.fire(key, obj, self);
     };
-    var changeFn = function(key, accessor){
+    var changeFn = function(key, oldVal, accessor){
       key = key.toString();
       _index.splice(_index.indexOf(key),1);
       _index.splice($L.Sort.locationOf(key, _index, _sortFn, accessor), 0, key);
-      _changeEvent.fire(key, self);
+      _changeEvent.fire(key, oldVal, self);
     };
 
     accessor.on.insert(inFn);
