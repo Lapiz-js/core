@@ -6,6 +6,7 @@
       "role": "string",
       "active": "bool",
     }, Lapiz.argDict());
+    return this;
   };
 
    Lapiz.Test("Class/ArgDict", ["Event/"], function(t){
@@ -49,7 +50,6 @@
         }
       }, {"id":id});
       this.attr.foo = 5;
-      return this.pub;
     });
     bar = Bar(314);
     var flag = false;
@@ -60,12 +60,26 @@
     flag || t.error("SetterEvent failed");
   });
 
+  Lapiz.Test("Class/GetterAttr", ["Event/"], function(t){
+    var Foo = Lapiz.Class(function(id, name){
+      this.getterAttr("id", "int", id);
+      this.properties({
+        "name": "string",
+      }, Lapiz.argDict());
+    });
+    var foo = Foo("13", "Adam");
+    foo.id === 13 || t.error("Expected 13");
+    foo.name === "Adam" || t.error("Expected 'Adam'")
+
+    foo.id = 22
+    foo.id === 13 || t.error("Expected 13");
+  });
+
   Lapiz.Test("Class/BadProperty", ["Event/", "Class/ArgDict"], function(t){
     var Bar = Lapiz.Class(function(id){
       this.properties({
         "id":null,
       }, {"id":id});
-      return this.pub;
     });
     var errStr = false;
     try{
@@ -221,19 +235,16 @@
 
 Lapiz.Test("Class/GetterSetterObj", ["Event/"], function(t){
   var PositiveInt = Lapiz.Class(function(val){
-    var self = this;
-    self.properties({
+    this.properties({
       "val": {
         "set": function(v){
           return Math.abs(v);
         },
-        "get": function(){
-          return self.attr.val;
-        }
+        "get": Lapiz.tis(this, function(){
+          return this.attr.val;
+        })
       }
     }, Lapiz.argDict());
-
-    return self.pub;
   });
 
   var p5 = PositiveInt(5);
@@ -245,27 +256,23 @@ Lapiz.Test("Class/GetterSetterObj", ["Event/"], function(t){
 
 Lapiz.Test("Class/GetterObj", ["Event/"], function(t){
   var RelationalKey = Lapiz.Class(function(valKey){
-    var self = Lapiz.Object();
+    var self = {};
     var _strIndex = ["apple","bannana","cantaloup"];
 
-    self.properties({
-      "valKey": "int",
-      "valStr": {
-        get: function(){
-          return _strIndex[self.attr.valKey];
-        }
-      }
-    }, Lapiz.argDict());
+    self.valKey = valKey;
+    Lapiz.Map.getter(self, function valStr(){
+      return _strIndex[self.valKey];
+    });
 
-    return self.pub;
+    return self;
   }, true);
 
   var r2 = RelationalKey(2);
   var r0 = RelationalKey(0);
 
-  r2.valKey === 2     || t.error("r2 error: "+ r2.valKey);
-  r2.valStr === "cantaloup"     || t.error("r2 error: "+ r2.valStr);
-  r0.valStr === "apple" || t.error("r0 error");
+  r2.valKey === 2           || t.error("r2 error: "+ r2.valKey);
+  r2.valStr === "cantaloup" || t.error("r2 error: "+ r2.valStr);
+  r0.valStr === "apple"     || t.error("r0 error");
 });
 
 Lapiz.Test("Class/OverrideSetter", ["Event/"], function(t){
@@ -278,7 +285,6 @@ Lapiz.Test("Class/OverrideSetter", ["Event/"], function(t){
         return val;
       }
     }, {"test": "test"});
-    return this.pub;
   });
 
   var test = Test();
@@ -299,15 +305,51 @@ Lapiz.Test("Class/Getter", ["Event/"], function(t){
       active : "bool",
     }, Lapiz.argDict());
 
-    this.getter(function foo(){
+    // test single getter
+    console.log("--")
+    this.getter(Lapiz.tis(this.pub, function foo(){
       return "foo " + this.id;
+    }));
+
+    // test multi getter array
+    this.getter([
+      function A(){ return "A"; },
+      function B(){ return "B"; },
+    ]);
+
+    this.getter({
+      "C": function(){return "C";},
+      "D": function(){return "D";},
     });
-    return this.pub;
+
   });
 
   p = Person("1", "Adam", "admin", true);
 
-  p.foo === "foo 1" || t.error("Expected 'foo 1'");
+  p.foo === "foo 1" || t.error("Expected 'foo 1', got: "+p.foo);
+
+  p.A === "A" || t.error("A");
+  p.B === "B" || t.error("B");
+  p.C === "C" || t.error("C");
+  p.D === "D" || t.error("D");
+});
+
+Lapiz.Test("Class/GetterStr", ["Event/"], function(t){
+  var Person = Lapiz.Class(function(id, name, role, active){
+    this.attr.id = Lapiz.parse.int(id);
+    this.getter("id");
+    this.properties({
+      name   : "string",
+      role   : "string",
+      active : "bool",
+    }, Lapiz.argDict());
+  });
+
+  p = Person("1", "Adam", "admin", true);
+
+  p.id === 1 || t.error("Expected 1");
+  p.id = 12;
+  p.id === 1 || t.error("Expected 1");
 });
 
 Lapiz.Test("Class/Method", ["Event/"], function(t){
@@ -350,4 +392,15 @@ Lapiz.Test("Class/ObjectConstructor", ["Event/"], function(t){
   Foo.id === 12       || t.error("Expected 12");
   Foo.id = "23.3"
   Foo.id === 23       || t.error("Expected 23");
+});
+
+Lapiz.Test("Class/Tis", ["Event/"], function(t){
+  function foo(){
+    return this.bar;
+  }
+  var A = {"bar":"A"};
+  var B = {"bar":"B"};
+
+  Lapiz.Map.meth(B, Lapiz.tis(A, foo));
+  B.foo() === "A" || t.error("Expected 'A'");
 });

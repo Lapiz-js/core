@@ -94,5 +94,13 @@ Lapiz.Module("Index", function($L){
       }
       return _primary(idFuncOrAttr);
     };
+
+    return cls;
+  });
+
+  // > Lapiz.Index.Class(constructor, primaryFunc, domain)
+  // Shorthand helper, constructor for an indexed class.
+  $L.Map.meth($L.Index, function Class(constructor, primaryFunc, domain){
+    return Lapiz.Index(Lapiz.Class(constructor), primaryFunc, domain);
   });
 });

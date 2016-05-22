@@ -49,4 +49,19 @@
     intArr[1] === 1 || t.error("Error at 1");
     intArr[2] === 4 || t.error("Error at 2");
   });
+
+  Lapiz.Test("Parse/ParseFunc", ["Parse/Int"], function(t){
+    var parser = Lapiz.parse("int");
+
+    Lapiz.typeCheck.func(parser)     || t.error("Expected function");
+    parser("123.4") === 123          || t.error("Parser is not int parser");
+    Lapiz.parse("int", "3.14") === 3 || t.error("expected 3");
+    Lapiz.parse(parser) === parser   || t.error("should have got parser back");
+
+    var arr = Lapiz.parse("array|int", [5.55, "4", "-12.34"]);
+    arr.length === 3 || t.error("wrong legnth");
+    arr[0] === 5     || t.error("expected 5");
+    arr[1] === 4     || t.error("expected 4");
+    arr[2] === -12   || t.error("expected -12");
+  });
 })();

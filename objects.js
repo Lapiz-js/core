@@ -1,4 +1,16 @@
+// The private fields on Lapiz Objects are intentionally attributes not
+// properties so that they can be rearranged if necessary.
 Lapiz.Module("Objects", ["Events"], function($L){
+
+  $L.Map.meth($L, function tis(self, fn){
+    $L.typeCheck.func(fn, "Lapiz.tis requires function as second argument");
+    var wrapped = function(){
+      return fn.apply(self, arguments);
+    };
+    $L.set(wrapped, "name", fn.name);
+    return wrapped;
+  });
+
   function _getter(self, funcOrProp){
     if ($L.typeCheck.func(funcOrProp)) { return funcOrProp; }
     if ($L.typeCheck.string(funcOrProp)) { return function(){ return self.attr[funcOrProp]; }; }
@@ -6,8 +18,7 @@ Lapiz.Module("Objects", ["Events"], function($L){
 
   function _setter(self, field, func){
     if ($L.typeCheck.string(func)){
-      $L.assert($L.parse[func] !== undefined, "Lapiz.parse does not have field "+func);
-      func = $L.parse[func];
+      func = $L.parse(func);
     }
     return function(){
       //todo: add test for fireChange and event
@@ -212,10 +223,43 @@ Lapiz.Module("Objects", ["Events"], function($L){
     };
 
     // > lapizObject.getter(getterFn)
+    // > lapizObject.getter(name, getterFn)
+    // > lapizObject.getter([getterFn, ..., getterFn])
+    // > lapizObject.getter([{name: getterFn}, ..., {name: getterFn}])
     // Creates a getter property in the public namespace.
-    self.getter = function(getterFn){
-      $L.Map.getter(self.pub, getterFn);
+    self.getter = function(name, getterFn){
+      if ($L.typeCheck.func(name)){
+        getterFn = name;
+        name = name.name;
+      } else if (getterFn === undefined){
+        if ($L.typeCheck.string(name)){
+          getterFn = function(){ return self.attr[name]; };
+        } else if ($L.typeCheck.array(name)){
+          return $L.each(name, function(getter){
+            self.getter(getter);
+          });
+        } else if ($L.typeCheck.obj(name)) {
+          return $L.each(name, function(getter, name){
+            self.getter(name, getter);
+          });
+        } 
+      }
+      $L.typeCheck.string(name, "Bad call to Lapiz.Object.getter: could not resolve string for name");
+      $L.typeCheck.func(getterFn, "Bad call to Lapiz.Object.getter: could not resolve function for getter");
+      $L.Map.getter(self.pub, name, getterFn);
     };
+
+    // > lapizObject.getterAttr(name, parserFn, val)
+    // > lapizObject.getterAttr(name, parserStr, val)
+    // Creates a read only attribute and sets it value to val after using the 
+    // parser
+    self.getterAttr = function(name, parser, val){
+      $L.typeCheck.string(name, "getterAttr requires name arg as a string");
+      self.attr[name] = $L.parse(parser, val);
+      $L.Map.getter(self.pub, name, function(){
+        return self.attr[name];
+      });
+    }
 
     // > lapizObject.meth(fn)
     // Creates a method in the public namespace.
@@ -303,7 +347,7 @@ Lapiz.Module("Objects", ["Events"], function($L){
     } else {
       ret = function(){
         var self = Lapiz.Object();
-        self = fn.apply(self, arguments) || self;
+        self = fn.apply(self, arguments) || self.pub;
         newInstanceEvent.fire(self);
         return self;
       };

@@ -6,11 +6,43 @@ Lapiz.Module("Parser", function($L){
     return parser;
   }
 
-  // > Lapiz.parse
-  // Namespace for parser methods. This namespace is left open
-  // so that it can be extended, particularly for use with defining
-  // object properties.
-  $L.set($L, "parse", $L.Map());
+  // > Lapiz.parse()
+  // Namespace for parser methods and a function to concisely invoke them
+  // > Lapiz.parse("int") === Lapiz.parse.int
+  // Which can be useful to take 
+  // > Lapiz.parse("array|int")
+  // or
+  // > Lapiz.parse("array|int")
+  $L.Map.meth($L, function parse(){
+    var parser;
+    var args = Array.prototype.slice.call(arguments, 0);
+    $L.assert(args.length > 0, "Lapiz.parse requires at least one arg");
+    var parseStrs = args.shift();
+    if (Lapiz.typeCheck.func(parseStrs)){
+      parser = parseStrs;
+      // Lapiz.parse(parserFn) => parserFn
+      return parseStrs;
+    } else if ($L.typeCheck.string(parseStrs)){
+      // something like "int" or "array|int"
+      // so we work backwards
+      parseStrs = parseStrs.split("|");
+      var parserName = parseStrs.pop();
+      $L.typeCheck.func(Lapiz.parse[parserName], "Lapiz.parse."+parserName+" is not a parser");
+      parser = Lapiz.parse[parserName];
+      while(parseStrs.length > 0){
+        parserName = parseStrs.pop();
+        $L.typeCheck.func(Lapiz.parse[parserName], "Lapiz.parse."+parserName+" is not a parser");
+        parser = Lapiz.parse[parserName].call(this, parser);
+      }
+    } else {
+      throw new Error("Lapiz.parse requires first arg as either string or function");
+    }
+
+    if (args.length>0){
+      return parser.apply(this, args);
+    }
+    return parser;
+  });
 
   // > Lapiz.parse.int(val)
   // > Lapiz.parse.int(val, rad)

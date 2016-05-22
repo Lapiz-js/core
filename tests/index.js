@@ -11,8 +11,6 @@
     this.meth(function del(){
       self.fire.delete(self.pub);
     });
-
-    return this.pub;
   };
 
   Lapiz.Test("Index/Index", ["Event/"], function(t){
@@ -39,9 +37,7 @@
   });
 
   Lapiz.Test("Index/CatchBadConstructor", ["Index/Index"], function(t){
-    var Person = Lapiz.Class(_Person);
-
-    Lapiz.Index(Person, "name");
+    var Person = Lapiz.Index.Class(_Person, "name");
 
     Person(50, "Stephen", "admin", true);
     Person(70, "Lauren", "editor", true);
@@ -311,7 +307,6 @@
         "id"    : "int",
         "name"  : "string"
       }, Lapiz.argDict());
-      return this.pub;
     });
 
     Lapiz.Index(One);

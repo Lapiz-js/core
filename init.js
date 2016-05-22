@@ -143,6 +143,13 @@ var Lapiz = (function ModuleLoaderModule($L){
   // will throw err if obj is not an number.
   $L.set($L.typeCheck, "number", function(obj, err){return $L.typeCheck(obj, "number", err)});
 
+  // > Lapiz.typeCheck.obj(obj)
+  // > Lapiz.typeCheck.obj(obj, err)
+  // Checks if the object is an object. If a string is supplied for err, it
+  // will throw err if obj is not an number. Note that many things like Arrays and
+  // Dates are objects, but numbers strings and functions are not.
+  $L.set($L.typeCheck, "obj", function(obj, err){return $L.typeCheck(obj, "object", err)});
+
   // > Lapiz.typeCheck.nested(obj, nestedFields..., typeCheckFunction)
   // > Lapiz.typeCheck.nested(obj, nestedFields..., typeCheckFunctionName)
   // Checks that each nested field exists and that the last field matches the function type.
