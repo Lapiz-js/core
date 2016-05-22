@@ -21,7 +21,7 @@ Lapiz.Module("Objects", ["Events"], function($L){
         var oldVal = self.attr[field];
         self.attr[field] = val;
         if (setterInterface.fireChange) {self.fire.change(self.pub);}
-        if (typeof setterInterface.event === "function") {setterInterface.event(self, val, oldVal);}
+        if ($L.typeCheck.func(setterInterface.event)) {setterInterface.event(self.pub, val, oldVal);}
       }
     };
   }
@@ -206,7 +206,7 @@ Lapiz.Module("Objects", ["Events"], function($L){
 
         Object.defineProperty(self.pub, property, desc);
       }
-      if (values!== undefined){
+      if (values !== undefined){
         self.setMany(values);
       }
     };
@@ -316,6 +316,23 @@ Lapiz.Module("Objects", ["Events"], function($L){
     // > lapizClass.on.create
     // Registration for event that will fire everytime a new instance is created
     $L.Event.linkProperty(ret.on, "create", newInstanceEvent);
+
+    // > lapizClass.StaticSet(name, value)
+    $L.Map.meth(ret, function StaticSet(name, value){$L.Map.prop(ret, name, { value: value });});
+    // > lapizClass.StaticProp(name, desc)
+    $L.Map.meth(ret, function StaticProp(name, desc){$L.Map.prop(ret, name, desc);});
+    // > lapizClass.StaticMeth(name, fn)
+    // > lapizClass.StaticMeth(namedFunc)
+    $L.Map.meth(ret, function StaticMethod(name, fn){$L.Map.meth(ret, name, fn);});
+    // > lapizClass.StaticSetterMethod(name, fn)
+    // > lapizClass.StaticSetterMethod(namedFunc)
+    $L.Map.meth(ret, function StaticSetterMethod(name, fn){$L.Map.setterMethod(ret, name, fn);});
+    // > lapizClass.StaticGetter(name, fn)
+    // > lapizClass.StaticGetter(nameeFunc)
+    $L.Map.meth(ret, function StaticGetter(name, fn){$L.Map.getter(ret, name, fn);});
+    // > lapizClass.StaticSetterGetter(name, setter)
+    // > lapizClass.StaticSetterGetter(name, setter, getter)
+    $L.Map.meth(ret, function StaticSetterGetter(name, setter, getter){$L.Map.setterGetter(ret, name, setter, getter);});
 
     _newClassEvent.fire(ret);
     return ret;

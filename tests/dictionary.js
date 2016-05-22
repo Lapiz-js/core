@@ -132,8 +132,8 @@ Lapiz.Test("Dictionary/AccessorEvents", ["Event/"], function(t){
     flags.change = dict(key) === "alex"
   });
 
-  accessor.on.remove(function(key, obj, dict){
-    flags.remove = obj === "alex" && key === "a" && !dict.has("a");
+  accessor.on.remove(function(key, dict, oldVal){
+    flags.remove = oldVal === "alex" && key === "a" && !dict.has("a");
   });
 
   dict("a", "adam");
@@ -153,7 +153,7 @@ Lapiz.Test("Dictionary/AccessorEventsProtected", ["Event/"], function(t){
     dict("change", true);
   });
 
-  accessor.on.remove(function(key, obj, dict){
+  accessor.on.remove(function(key, dict, oldVal){
     dict("remove", true);
   });
 

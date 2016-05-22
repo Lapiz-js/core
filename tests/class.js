@@ -38,6 +38,108 @@
     person.active === true   || t.error("Active was not set correctly");
   });
 
+  Lapiz.Test("Class/SetterEvent", ["Event/", "Class/ArgDict"], function(t){
+    var evt = Lapiz.Event();
+    var Bar = Lapiz.Class(function(id){
+      this.properties({
+        "id":"int",
+        "foo": function(val){
+          this.event = evt.fire;
+          return Lapiz.parse.int(val);
+        }
+      }, {"id":id});
+      this.attr.foo = 5;
+      return this.pub;
+    });
+    bar = Bar(314);
+    var flag = false;
+    evt.register(function(bar, newVal, oldVal){
+      flag = (bar.id === 314 && newVal === 123 && oldVal === 5);
+    });
+    bar.foo = 123;
+    flag || t.error("SetterEvent failed");
+  });
+
+  Lapiz.Test("Class/BadProperty", ["Event/", "Class/ArgDict"], function(t){
+    var Bar = Lapiz.Class(function(id){
+      this.properties({
+        "id":null,
+      }, {"id":id});
+      return this.pub;
+    });
+    var errStr = false;
+    try{
+      Bar(111);
+    } catch (err) {
+      errStr = err.message;
+    }
+    errStr === "Invalid value for 'id'" || t.error("Expected error");
+  });
+
+  Lapiz.Test("Class/BadConstructor", ["Event/", "Class/ArgDict"], function(t){
+    var Bar = Lapiz.Class(function(){}, true);
+    var errStr = false;
+    try{
+      Bar();
+    } catch (err) {
+      errStr = err.message;
+    }
+    errStr === "Constructor did not return an object" || t.error("Expected error");
+  });
+
+  Lapiz.Test("Class/Static/Set", ["Event/", "Class/ArgDict"], function(t){
+    var Person = Lapiz.Class(_Person);
+    Person.StaticSet("foo","bar");
+    Person.foo === "bar" || t.error("Expected 'bar'");
+  });
+
+  Lapiz.Test("Class/Static/Prop", ["Event/", "Class/ArgDict"], function(t){
+    var Person = Lapiz.Class(_Person);
+    Person.StaticProp("foo",{"value":"bar"});
+    Person.foo === "bar" || t.error("Expected 'bar'");
+  });
+
+  Lapiz.Test("Class/Static/Method", ["Event/", "Class/ArgDict"], function(t){
+    var Person = Lapiz.Class(_Person);
+    Person.StaticMethod(function foo(){return "bar";});
+    Person.foo() === "bar" || t.error("Expected 'bar'");
+  });
+
+  Lapiz.Test("Class/Static/SetterMethod", ["Event/", "Class/ArgDict"], function(t){
+    var Person = Lapiz.Class(_Person);
+    var flag = false;
+    Person.StaticSetterMethod(function foo(val){flag = val;});
+
+    Person.foo = "test 1";
+    flag === "test 1" || t.error("Expected 'test 1'");
+
+    Person.foo("test 2");
+    flag === "test 2" || t.error("Expected 'test 2'");
+  });
+
+  Lapiz.Test("Class/Static/Getter", ["Event/", "Class/ArgDict"], function(t){
+    var Person = Lapiz.Class(_Person);
+    var val = false;
+    Person.StaticGetter(function foo(){return val;});
+
+    val = "test 1";
+    Person.foo === "test 1" || t.error("Expected 'test 1'");
+
+    val = "test 2";
+    Person.foo === "test 2" || t.error("Expected 'test 2'");
+  });
+
+  Lapiz.Test("Class/Static/SetterGetter", ["Event/", "Class/ArgDict"], function(t){
+    var Person = Lapiz.Class(_Person);
+    Person.StaticSetterGetter("foo", "int");
+
+    Person.foo = "22";
+    Person.foo === 22 || t.error("Expected 22");
+
+    Person.foo = 3.141;
+    Person.foo === 3 || t.error("Expected 3");
+  });
+
   Lapiz.Test("Class/ChangeOnSetAll", ["Event/", "Class/SetMany"], function(t){
     var Person = Lapiz.Class(_Person);
 
@@ -102,6 +204,18 @@
     flags.role        || t.error("Role flag was not tripped");
     active === true   || t.error("Active was not set correctly");
     flags.active      || t.error("Active flag was not tripped");
+  });
+
+  Lapiz.Test("Class/StaticMethod", ["Event/", "Class/ArgDict"], function(t){
+    var Person = Lapiz.Class(_Person);
+    var flag = false;
+    Person.StaticMethod(function test(){
+      flag = true;
+    });
+
+    Person.test();
+
+    flag || t.error("StaticMethod was not called");
   });
 })();
 

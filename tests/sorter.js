@@ -13,7 +13,7 @@ as well as withing the Lapiz sorter module
 */
 
 (function(){
-  var dict = Lapiz.Dictionary({
+  var data = {
     1: {
       name: "Stephen",
       fruit:"apple"
@@ -30,15 +30,13 @@ as well as withing the Lapiz sorter module
       name: "Alex", 
       fruit: "dates"
     }
-  });
+  };
+  var dict = Lapiz.Dictionary(data);
 
   Lapiz.Test("Sorter/Sort", ["Dictionary/"], function(t){
     var nameSorter = Lapiz.Sort(dict, "name");
-
-    var flag, k;
-
-    flag = true;
-    k = nameSorter.keys;
+    var flag = true;
+    var k = nameSorter.keys;
     Lapiz.each(['3','4','2','1'], function(val, i){
       flag = flag && val === k[i];
     })
@@ -54,6 +52,7 @@ as well as withing the Lapiz sorter module
       flag = flag && val === k[i];
     })
     flag || t.error("Expected" + ['1','2','3','4'] + ", got " + nameSorter.keys);
+    nameSorter('3').name === "Adam" || t.error("Expected 'Adam'");
   });
 
   Lapiz.Test("Sorter/SortByField", ["Sorter/Sort"], function(t){
@@ -121,7 +120,7 @@ as well as withing the Lapiz sorter module
     dict(3,"cantaloup");
     dict(4,"dates");
     var sorter = Lapiz.Sort(dict);
-    sorter.delete();
+    sorter.kill();
 
 
     var removeFlag = false;
@@ -149,8 +148,10 @@ as well as withing the Lapiz sorter module
 
     flag = true;
     k = sorted.keys;
-    Lapiz.each(['b','d','a','c'], function(val, i){
-      flag = flag && val === k[i];
+    var i=0;
+    sorted.each(function(val, key, acc){
+      flag = flag && key === k[i];
+      i += 1;
     })
     flag || t.error("Expected " + ['b','d','a','c'] + ", got " + k);
   });
@@ -178,6 +179,56 @@ as well as withing the Lapiz sorter module
 
     range('a') === 'Dan' || t.error("Expected 'Dan'");
     !range.has('b')      || t.error("b:Adam should not be in the list");
+  });
+
+  Lapiz.Test("Sorter/Each", ["Sorter/Sort"], function(t){
+    var sorted = Lapiz.Sort(Lapiz.Dictionary(data));
+    var key = sorted.each(function(val){
+      return val.name === "Adam";
+    });
+    key === '3' || t.error("Wrong key");
+  });
+
+  Lapiz.Test("Sorter/Func", ["Sorter/Sort"], function(t){
+    var sorted = Lapiz.Sort(Lapiz.Dictionary(data));
+    sorted.keys[0] === '1' || t.error("Wrong key init");
+    sorted.func = "name";
+    sorted.keys[0] === '3' || t.error("Wrong key after");
+  });
+
+  Lapiz.Test("Sorter/RangeFn", ["Sorter/Sort"], function(t){
+    function sortFn(a, b, acc){
+      a = acc(a);
+      b = acc(b);
+      return (a.name > b.name ? 1 : (b.name > a.name ? -1 : 0));
+    }
+    Lapiz.Map.meth(sortFn, function range(key, name, acc){
+      var obj = acc(key);
+      return (obj.name > name ? 1 : (name > obj.name ? -1 : 0)); 
+    });
+    var sorted = Lapiz.Sort(Lapiz.Dictionary(data), sortFn);
+    var range = sorted.Range('A','B');
+
+    range.length === 2       || t.error("Wrong number of keys");
+    range(3).name === 'Adam' || t.error("Expected 'Adam'");
+  });
+
+  Lapiz.Test("Sorter/RangeField", ["Sorter/Sort"], function(t){
+    var sorted = Lapiz.Sort(Lapiz.Dictionary(data), "name");
+    var range = sorted.Range('A','B');
+
+    range.length === 2       || t.error("Wrong number of keys");
+    range(3).name === 'Adam' || t.error("Expected 'Adam'");
+  });
+
+  Lapiz.Test("Sorter/LocationOf", ["Sorter/Sort"], function(t){
+    // this test forces some of the edge cases in locationOf and gt
+    var sort = Lapiz.Sort(Lapiz.Dictionary([{i:2}]), "i");
+    var range = sort.Range(2);
+    (range.length === 1 && range.keys[0] === "0") || t.error("Range(2) failed");
+    
+    range = sort.Range(3);
+    range.length === 0 || t.error("Range(3) failed");
   });
 })();
 

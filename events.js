@@ -130,10 +130,14 @@ Lapiz.Module("Events", ["Collections"], function($L){
   map.foo.deregister(fn);
   */
   $L.set($L.Event, "linkProperty", function(obj, name, evt){
+    if (evt === undefined){
+      evt = $L.Event();
+    }
     Object.defineProperty(obj, name, {
       get: function(){ return evt.register; },
       set: function(fn){ evt.register(fn); }
     });
+    return evt;
   });
 
   $L.on = $L.Map();

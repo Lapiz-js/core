@@ -1,17 +1,67 @@
-Lapiz.Test("CollectionsHelper/Namespace-Set", function(t){
+Lapiz.Test("CollectionsHelper/Namespace/Set", function(t){
   var ns = Lapiz.Namespace();
   ns.set("foo","bar");
 
   ns.namespace.foo === "bar" || t.error('Expected namespace.foo === "bar"');
 });
 
-Lapiz.Test("CollectionsHelper/Namespace-Method", function(t){
+Lapiz.Test("CollectionsHelper/Namespace/Getter", function(t){
+  var ns = Lapiz.Namespace();
+  var bar = "star";
+  ns.getter(function foo(){
+    return bar;
+  });
+
+  ns.namespace.foo === "star" || t.error('Expected namespace.foo === "star"');
+  bar = "car";
+  ns.namespace.foo === "car" || t.error('Expected namespace.foo === "car"');
+});
+
+Lapiz.Test("CollectionsHelper/Namespace/SetterGetter", function(t){
+  var ns = Lapiz.Namespace();
+  ns.setterGetter("foo", "int");
+
+  ns.namespace.foo = "12";
+  ns.namespace.foo === 12 || t.error('Expected namespace.foo === 12');
+
+  ns.namespace.foo = 3.1415;
+  ns.namespace.foo === 3 || t.error('Expected namespace.foo === 3');
+});
+
+Lapiz.Test("CollectionsHelper/Namespace/Method", function(t){
   var ns = Lapiz.Namespace();
   ns.meth(function foo(){
     return "bar";
   });
 
   ns.namespace.foo() === "bar" || t.error('Expected namespace.foo() === "bar"');
+});
+
+Lapiz.Test("CollectionsHelper/Namespace/Prop", function(t){
+  var ns = Lapiz.Namespace();
+  ns.prop("foo", {"value":"bar"});
+
+  ns.namespace.foo === "bar" || t.error('Expected namespace.foo === "bar"');
+});
+
+Lapiz.Test("CollectionsHelper/Namespace/SetterMethod", function(t){
+  var ns = Lapiz.Namespace();
+  var test = false;
+  ns.setterMethod(function foo(val){
+    test = val;
+  });
+
+  ns.namespace.foo = "test 1";
+  test === "test 1" || t.error('Expected "test 1"');
+
+  ns.namespace.foo("test 2");
+  test === "test 2" || t.error('Expected "test 2"');
+});
+
+Lapiz.Test("CollectionsHelper/Has", function(t){
+  var foo = {"bar" : undefined};
+
+  Lapiz.Map.has(foo, "bar") || t.error('Expected has bar');
 });
 
 Lapiz.Test("CollectionsHelper/Map", function(t){
@@ -115,12 +165,17 @@ Lapiz.Test("CollectionsHelper/NamespaceConstructor", function(t){
 Lapiz.Test("CollectionsHelper/Method", function(t){
   var obj = {};
   var flag = "failed";
-  Lapiz.Map.meth(obj, function foo(val){
+  function foo(val){
     flag = val;
-  });
+  }
+  Lapiz.Map.meth(obj, foo);
+  Lapiz.Map.meth(obj, "bar", foo);
 
-  obj.foo("pass");
-  flag === "pass" || t.error("Expected 'pass'");
+  obj.foo("pass A");
+  flag === "pass A" || t.error("Expected 'pass A'");
+
+  obj.bar("pass B");
+  flag === "pass B" || t.error("Expected 'pass B'");
 });
 
 Lapiz.Test("CollectionsHelper/SetterMethod", function(t){
@@ -196,4 +251,21 @@ Lapiz.Test("CollectionsHelper/CopyPropRef", function(t){
   objTo.A = "apricot";
   objTo.A === "apricot"   || t.error("Expected 'apricot', got "+objTo.A);
   objFrom.A === "apricot" || t.error("Expected 'apricot', got "+objFrom.A);
+});
+
+Lapiz.Test("CollectionsHelper/BadConstructorsTest", function(t){
+  function errMsg(fn){
+    try{
+      fn();
+    } catch(err){
+      return err.message;
+    }
+  }
+
+  errMsg(function(){Lapiz.Map.meth(function foo(){});}) === "Meth called without object: foo" || t.error("Expected meth error");
+  errMsg(function(){Lapiz.Map.meth({}, function(){});}) === "Meth requires either name and func or named function" || t.error("Expected meth error");
+  errMsg(function(){Lapiz.Map.setterMethod(function foo(){});}) === "SetterMethod called without object: foo" || t.error("Expected setterMethod error");
+  errMsg(function(){Lapiz.Map.setterMethod({}, "", function(){});}) === "SetterMethod name cannot be empty string" || t.error("Expected setterMethod error");
+  errMsg(function(){Lapiz.Map.getter(function foo(){});}) === "Getter called without object: foo" || t.error("Expected getter error");
+  errMsg(function(){Lapiz.Map.getter({}, "", function(){});}) === "Getter name cannot be empty string" || t.error("Expected setterMethod error");
 });
