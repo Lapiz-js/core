@@ -9,7 +9,7 @@ Lapiz.Module("Collections", function($L){
   // create a proptery that cannot be overridden.
   function Map(){
     return Object.create(null);
-  };
+  }
   $L.set($L, "Map", Map);
 
   // > Lapiz.Map.meth(obj, namedFunc)
@@ -24,7 +24,7 @@ Lapiz.Module("Collections", function($L){
     if (name === undefined && $L.typeCheck.func(obj)){
       // common special case: user forgot obj, attached named function
       // we can provide a very specific and helpful error
-      $L.Err.throw("Meth called without object: "+obj.name);
+      $L.Err['throw']("Meth called without object: "+obj.name);
     }
     if ($L.typeCheck.func(fn) && $L.typeCheck.string(name)){
       $L.assert(name !== "", "Meth name cannot be empty string");
@@ -32,7 +32,7 @@ Lapiz.Module("Collections", function($L){
       fn = name;
       name = fn.name;
     } else {
-      Lapiz.Err.throw("Meth requires either name and func or named function");
+      Lapiz.Err['throw']("Meth requires either name and func or named function");
     }
     $L.set(obj, name, fn);
   });
@@ -56,7 +56,7 @@ Lapiz.Module("Collections", function($L){
   */
   Map.meth(Map, function setterMethod(obj, name, fn){
     if (name === undefined && $L.typeCheck.func(obj)){
-      Lapiz.Err.throw("SetterMethod called without object: "+obj.name);
+      Lapiz.Err['throw']("SetterMethod called without object: "+obj.name);
     }
     if ($L.typeCheck.func(fn) && $L.typeCheck.string(name)){
       $L.assert(name !=="", "SetterMethod name cannot be empty string");
@@ -64,11 +64,11 @@ Lapiz.Module("Collections", function($L){
       fn = name;
       name = fn.name;
     } else {
-      Lapiz.Err.throw("SetterMethod requires either name and func or named function");
+      Lapiz.Err['throw']("SetterMethod requires either name and func or named function");
     }
     Map.prop(obj, name, {
       "get": function(){ return fn; },
-      "set": fn,
+      "set": fn
     });
   });
 
@@ -96,7 +96,7 @@ Lapiz.Module("Collections", function($L){
   */
   Map.meth(Map, function getter(obj, name, fn){
     if (name === undefined && $L.typeCheck.func(obj)){
-      Lapiz.Err.throw("Getter called without object: "+obj.name);
+      Lapiz.Err['throw']("Getter called without object: "+obj.name);
     }
     if ($L.typeCheck.func(fn) && $L.typeCheck.string(name)){
       $L.assert(name !=="", "Getter name cannot be empty string");
@@ -114,9 +114,9 @@ Lapiz.Module("Collections", function($L){
       });
       return;
     } else {
-      Lapiz.Err.throw("Getter requires either name and func or named function");
+      Lapiz.Err['throw']("Getter requires either name and func or named function");
     }
-    Map.prop(obj, name, {"get": fn,} );
+    Map.prop(obj, name, {"get": fn} );
   });
 
   // > Lapiz.Map.setterGetter(obj, name, val, setterFunc, getterFunc)
@@ -162,9 +162,7 @@ Lapiz.Module("Collections", function($L){
       };
     }
     desc.set = function(newVal){
-      var setterInterface = {
-        "set": true,
-      };
+      var setterInterface = {"set": true};
       newVal = setter.apply(setterInterface, [newVal, val, obj]);
       if (setterInterface.set){
         val = newVal;
@@ -200,9 +198,13 @@ Lapiz.Module("Collections", function($L){
           "get": (function(prop){
             return function(){
               return copyFrom[prop];
-            }
+            };
           })(prop),
-          "set": (function(prop){return function(val){copyFrom[prop] = val}})(prop),
+          "set": (function(prop){
+            return function(val){
+              copyFrom[prop] = val;
+            };
+          })(prop)
         });
       } else {
         copyTo[prop] = copyFrom[prop];
@@ -315,6 +317,7 @@ Lapiz.Module("Collections", function($L){
         if (fn(obj[keys[i]], keys[i], obj)) {return keys[i];}
       }
     }
+    return undefined; //makes linter happy
   });
 
   // > Lapiz.ArrayConverter(accessor)
