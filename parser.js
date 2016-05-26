@@ -33,7 +33,7 @@ Lapiz.Module("Parser", function($L){
         parser = Lapiz.parse[parserName].call(this, parser);
       }
     } else {
-      throw new Error("Lapiz.parse requires first arg as either string or function");
+      Lapiz.Err.throw("Lapiz.parse requires first arg as either string or function");
     }
 
     if (args.length>0){
@@ -43,19 +43,17 @@ Lapiz.Module("Parser", function($L){
   });
 
   // > Lapiz.parse.int(val)
-  // > Lapiz.parse.int(val, rad)
-  // If rad is not defined it will default to 10. This is mostly a wrapper
+  // Always parses in base 10. This is mostly a wrapper
   // around parseInt, however if val is a boolean it will reurn eitehr 1
   // or 0.
-  $L.set($L.parse, "int", function(val,rad){
+  $L.set($L.parse, "int", function(val){
     //can't use $L.Map.meth because "int" is reserve word
     if (val === true){
       return 1;
     } else if (val === false){
       return 0;
     }
-    rad = rad || 10;
-    return parseInt(val, rad);
+    return parseInt(val, 10);
   });
 
   // > Lapiz.parse.string
@@ -69,7 +67,12 @@ Lapiz.Module("Parser", function($L){
     if (val === undefined || val === null) { return ""; }
     var type = typeof(val);
     if (type === "string") { return val; }
-    if (type === "number") { return ""+val; }
+    if (type === "number") {
+      if (isNaN(val)){
+        return "";
+      }
+      return ""+val;
+    }
     var strFromMethod;
     if ($L.typeCheck.nested(val, "str", "func")) {
       strFromMethod = val.str();
@@ -83,8 +86,20 @@ Lapiz.Module("Parser", function($L){
   });
 
   // > Lapiz.parse.bool(val)
+  // Converts val to a bool. Takes into account a few special edge cases, "O"
+  // and "false" (any case) are cast to false.
+  $L.Map.meth($L.parse, function bool(val){
+    if ($L.typeCheck.string(val) && (val === "0" || val.toLowerCase() === "false")){
+      return false;
+    }
+    return !!val;
+  });
+
+  // > Lapiz.parse.strictBool(val)
   // Converts val to a bool
-  $L.Map.meth($L.parse, function bool(val){ return !!val; });
+  $L.Map.meth($L.parse, function strictBool(val){
+    return !!val;
+  });
 
   // > Lapiz.parse.number(val)
   // Converts val to a number. This is a wrapper around parseFloat.

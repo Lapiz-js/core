@@ -61,7 +61,7 @@ Lapiz.Module("Sorter", function($L){
           return (a > b ? 1 : (b > a ? -1 : 0));
         };
       } else {
-        throw new Error("Sorter function must be omitted, function or field name");
+        Lapiz.Err.throw("Sorter function must be omitted, function or field name");
       }
     }
     setSortFn(funcOrField);

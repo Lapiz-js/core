@@ -77,3 +77,23 @@ Lapiz.Test("Init/Assert", function(t){
   }
   errMsg === "Testing" || t.error("Expected error");
 });
+
+Lapiz.Test("Init/Set", function(t){
+  var obj = {};
+  Lapiz.set(obj, "foo", "bar");
+  Lapiz.set(obj, function baz(){
+    return "glorp";
+  });
+
+  obj.foo === "bar"     || t.error("Expected 'bar'");
+  obj.baz() === "glorp" || t.error("Expected 'baz', got: "+obj.baz());
+
+  var errMsg = false;
+  try {
+    obj.foo = "throw me an error";
+  } catch(err){
+    errMsg = err.message;
+  }
+
+  errMsg === "Attempting to set read-only property foo" || t.error("Did not throw error attempting to set foo");
+});

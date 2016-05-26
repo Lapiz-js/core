@@ -18,7 +18,7 @@ Lapiz.Module("Filter", function($L){
 
     // > filter._cls
     // Return Lapiz.Filter
-    $L.set($L, "_cls", $L.Filter);
+    $L.set(self, "_cls", $L.Filter);
 
     // if filterOrField is a string, and val is set, create a function
     // to check that field against the val

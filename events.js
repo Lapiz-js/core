@@ -58,8 +58,7 @@ Lapiz.Module("Events", ["Collections"], function($L){
     // The event.enabled is a boolean that can be set to enable or disable the
     // fire method. If event.fire.enable is false, even if event.fire is called,
     // it will not call the registered functions.
-    $L.Map.setterGetter(event.fire, "enabled", function(enable){ return !!enable; });
-    event.fire.enabled = true;
+    $L.Map.setterGetter(event.fire, "enabled", true, function(enable){ return !!enable; });
 
     // > event.fire.length
     // The event.length is a read-only property that returns the number of
@@ -140,5 +139,5 @@ Lapiz.Module("Events", ["Collections"], function($L){
     return evt;
   });
 
-  $L.on = $L.Map();
+  $L.set($L, "on", $L.Map());
 });

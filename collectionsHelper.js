@@ -21,7 +21,7 @@ Lapiz.Module("Collections", function($L){
   */
   $L.set(Map, "meth", function(obj, name, fn){
     if (name === undefined && $L.typeCheck.func(obj)){
-      throw new Error("Meth called without object: "+obj.name);
+      $L.Err.throw("Meth called without object: "+obj.name);
     }
     if ($L.typeCheck.func(fn) && $L.typeCheck.string(name)){
       $L.assert(name !=="", "Meth name cannot be empty string");
@@ -29,7 +29,7 @@ Lapiz.Module("Collections", function($L){
       fn = name;
       name = fn.name;
     } else {
-      throw new Error("Meth requires either name and func or named function");
+      Lapiz.Err.throw("Meth requires either name and func or named function");
     }
     $L.set(obj, name, fn);
   });
@@ -52,7 +52,7 @@ Lapiz.Module("Collections", function($L){
   */
   Map.meth(Map, function setterMethod(obj, name, fn){
     if (name === undefined && $L.typeCheck.func(obj)){
-      throw new Error("SetterMethod called without object: "+obj.name);
+      Lapiz.Err.throw("SetterMethod called without object: "+obj.name);
     }
     if ($L.typeCheck.func(fn) && $L.typeCheck.string(name)){
       $L.assert(name !=="", "SetterMethod name cannot be empty string");
@@ -60,7 +60,7 @@ Lapiz.Module("Collections", function($L){
       fn = name;
       name = fn.name;
     } else {
-      throw new Error("SetterMethod requires either name and func or named function");
+      Lapiz.Err.throw("SetterMethod requires either name and func or named function");
     }
     Map.prop(obj, name, {
       "get": function(){ return fn; },
@@ -76,6 +76,8 @@ Lapiz.Module("Collections", function($L){
 
   // > Lapiz.Map.getter(object, namedGetterFunc() )
   // > Lapiz.Map.getter(object, name, getterFunc() )
+  // > Lapiz.Map.getter(object, [namedGetterFuncs...] )
+  // > Lapiz.Map.getter(object, {name: getterFunc...} )
   // Attaches a getter method to an object. The method must be a named function.
   /* >
   var x = Lapiz.Map();
@@ -90,38 +92,46 @@ Lapiz.Module("Collections", function($L){
   */
   Map.meth(Map, function getter(obj, name, fn){
     if (name === undefined && $L.typeCheck.func(obj)){
-      throw new Error("Getter called without object: "+obj.name);
+      Lapiz.Err.throw("Getter called without object: "+obj.name);
     }
     if ($L.typeCheck.func(fn) && $L.typeCheck.string(name)){
       $L.assert(name !=="", "Getter name cannot be empty string");
     } else if ($L.typeCheck.func(name) && name.name !== ""){
       fn = name;
       name = fn.name;
+    } else if ($L.typeCheck.array(name)){
+      $L.each(name, function(getterFn){
+        Map.getter(obj, getterFn);
+      });
+      return;
+    } else if ($L.typeCheck.obj(name)){
+      $L.each(name, function(getterFn, name){
+        Map.getter(obj, name, getterFn);
+      });
+      return;
     } else {
-      throw new Error("Getter requires either name and func or named function");
+      Lapiz.Err.throw("Getter requires either name and func or named function");
     }
     Map.prop(obj, name, {"get": fn,} );
   });
 
-  // > Lapiz.Map.setterGetter(obj, name, setterFunc, getterFunc)
-  // > Lapiz.Map.setterGetter(obj, name, setterFunc)
+  // > Lapiz.Map.setterGetter(obj, name, val, setterFunc, getterFunc)
+  // > Lapiz.Map.setterGetter(obj, name, val, setterFunc)
   // Creates a setter/getter property via a closure. A setter function is
   // required, if no getter is provided, the value will be returned. This is the
   // reason the method is named setterGetter rather than the more traditional
   // arrangement of "getterSetter" because the arguments are arranged so that
-  // the first 3 are required and the last is optional.
+  // the first 4 are required and the last is optional.
   /* >
   var x = Lapiz.Map();
-  Lapiz.Map.setterGetter(x, "foo", function(i){return parseInt(i);});
-
-  x.foo = "12";
+  Lapiz.Map.setterGetter(x, "foo", 12, function(i){return parseInt(i);});
   console.log(x.foo); // will log 12 as an int
   */
   // The value 'this' is always set to a special setterInterface for the setter
   // method. This can be used to cancel the set operation;
   /* >
   var x = Lapiz.Map();
-  Lapiz.Map.setterGetter(x, "foo", function(i){
+  Lapiz.Map.setterGetter(x, "foo", 0, function(i){
     i = parseInt(i);
     this.set = !isNaN(i);
     return i;
@@ -133,12 +143,11 @@ Lapiz.Module("Collections", function($L){
   console.log(x.foo); // value will still be 12
 
   */
-  Map.meth(Map, function setterGetter(obj, name, setter, getter){
+  Map.meth(Map, function setterGetter(obj, name, val, setter, getter){
     if ($L.typeCheck.string(setter)){
-      setter = $L.parse[setter];
+      setter = $L.parse(setter);
     }
-    $L.typeCheck.func(setter, "Expected function or string reference to parser for setterGetter (argument 3)");
-    var val;
+    $L.typeCheck.func(setter, "Expected function or string reference to parser for setterGetter (argument 4)");
     var desc = {};
     if (getter === undefined){
       desc.get = function(){ return val; };
@@ -232,8 +241,8 @@ Lapiz.Module("Collections", function($L){
   // * namespace.meth(namedFunc)
   // * namespace.setterMethod(namedSetterFunc)
   // * namespace.getter(namedGetterFunc)
-  // * namespace.setterGetter(name, setter, getter)
-  // * namespace.setterGetter(name, setter)
+  // * namespace.setterGetter(name, val, setter, getter)
+  // * namespace.setterGetter(name, val, setter)
   Map.meth($L, function Namespace(fn){
     var self = $L.Map();
     self.namespace = $L.Map();
@@ -243,7 +252,7 @@ Lapiz.Module("Collections", function($L){
     Map.meth(self, function meth(name, fn){Map.meth(self.namespace, name, fn);});
     Map.meth(self, function setterMethod(name, fn){Map.setterMethod(self.namespace, name, fn);});
     Map.meth(self, function getter(name, fn){Map.getter(self.namespace, name, fn);});
-    Map.meth(self, function setterGetter(name, setter, getter){Map.setterGetter(self.namespace, name, setter, getter);});
+    Map.meth(self, function setterGetter(name, val, setter, getter){Map.setterGetter(self.namespace, name, val, setter, getter);});
 
     if ($L.typeCheck.func(fn)){
       fn.apply(self);

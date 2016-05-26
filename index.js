@@ -25,7 +25,7 @@ Lapiz.Module("Index", function($L){
         };
       }(primaryFunc);
     } else if ( !(primaryFunc instanceof  Function) ){
-      throw new Error("Expected a function or string");
+      Lapiz.Err.throw("Expected a function or string");
     }
 
     if (domain === undefined) {
@@ -71,7 +71,9 @@ Lapiz.Module("Index", function($L){
     cls.on.create(function(obj){
       obj.on.change(_upsert);
       obj.on["delete"](function(obj){
-        obj.on.change.deregister(_upsert);
+        if ($L.typeCheck.nested(obj, "on", "change", "deregister", "func")){
+          obj.on.change.deregister(_upsert);
+        }
         _primary.remove(primaryFunc(obj));
       });
       _upsert(obj);

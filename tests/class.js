@@ -145,8 +145,9 @@
 
   Lapiz.Test("Class/Static/SetterGetter", ["Event/", "Class/ArgDict"], function(t){
     var Person = Lapiz.Class(_Person);
-    Person.StaticSetterGetter("foo", "int");
+    Person.StaticSetterGetter("foo", 10, "int");
 
+    Person.foo === 10 || t.error("Expected 10");
     Person.foo = "22";
     Person.foo === 22 || t.error("Expected 22");
 
@@ -306,7 +307,6 @@ Lapiz.Test("Class/Getter", ["Event/"], function(t){
     }, Lapiz.argDict());
 
     // test single getter
-    console.log("--")
     this.getter(Lapiz.tis(this.pub, function foo(){
       return "foo " + this.id;
     }));

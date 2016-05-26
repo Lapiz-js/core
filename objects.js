@@ -202,7 +202,7 @@ Lapiz.Module("Objects", ["Events"], function($L){
         desc = {};
 
         if (val === undefined || val === null){
-          throw new Error("Invalid value for '" + property + "'");
+          Lapiz.Err.throw("Invalid value for '" + property + "'");
         } else if ($L.typeCheck.func(val)|| $L.typeCheck.string(val)){
           desc.set = _setter(self, property, val);
           desc.get = _getter(self, property);
@@ -212,7 +212,7 @@ Lapiz.Module("Objects", ["Events"], function($L){
           }
           desc.get = (val.get !== undefined) ? _getter(self, val.get) : _getter(self, property);
         } else {
-          throw new Error("Could not construct getter/setter for " + val);
+          Lapiz.Err.throw("Could not construct getter/setter for " + val);
         }
 
         Object.defineProperty(self.pub, property, desc);
@@ -263,8 +263,8 @@ Lapiz.Module("Objects", ["Events"], function($L){
 
     // > lapizObject.meth(fn)
     // Creates a method in the public namespace.
-    self.meth = function(fn){
-      $L.Map.meth(self.pub, fn);
+    self.meth = function(name, fn){
+      $L.Map.meth(self.pub, name, fn);
     };
 
     if ($L.typeCheck.func(constructor)){
@@ -340,7 +340,7 @@ Lapiz.Module("Objects", ["Events"], function($L){
     if (customObj){
       ret = function(){
         var obj = fn.apply(this, arguments);
-        if (obj === undefined) {throw new Error("Constructor did not return an object");}
+        if (obj === undefined) {Lapiz.Err.throw("Constructor did not return an object");}
         newInstanceEvent.fire(obj);
         return obj;
       };
@@ -374,9 +374,9 @@ Lapiz.Module("Objects", ["Events"], function($L){
     // > lapizClass.StaticGetter(name, fn)
     // > lapizClass.StaticGetter(nameeFunc)
     $L.Map.meth(ret, function StaticGetter(name, fn){$L.Map.getter(ret, name, fn);});
-    // > lapizClass.StaticSetterGetter(name, setter)
-    // > lapizClass.StaticSetterGetter(name, setter, getter)
-    $L.Map.meth(ret, function StaticSetterGetter(name, setter, getter){$L.Map.setterGetter(ret, name, setter, getter);});
+    // > lapizClass.StaticSetterGetter(name, val, setter)
+    // > lapizClass.StaticSetterGetter(name, val, setter, getter)
+    $L.Map.meth(ret, function StaticSetterGetter(name, val, setter, getter){$L.Map.setterGetter(ret, name, val, setter, getter);});
 
     _newClassEvent.fire(ret);
     return ret;

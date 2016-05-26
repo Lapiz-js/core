@@ -19,9 +19,8 @@ Lapiz.Test("CollectionsHelper/Namespace/Getter", function(t){
 
 Lapiz.Test("CollectionsHelper/Namespace/SetterGetter", function(t){
   var ns = Lapiz.Namespace();
-  ns.setterGetter("foo", "int");
+  ns.setterGetter("foo", 12, "int");
 
-  ns.namespace.foo = "12";
   ns.namespace.foo === 12 || t.error('Expected namespace.foo === 12');
 
   ns.namespace.foo = 3.1415;
@@ -192,7 +191,7 @@ Lapiz.Test("CollectionsHelper/SetterMethod", function(t){
   flag === "pass B" || t.error("Expected 'pass B'");
 });
 
-Lapiz.Test("CollectionsHelper/Getter", function(t){
+Lapiz.Test("CollectionsHelper/Getter/NamedFunc", function(t){
   var obj = {};
   var ctr = 0;
   Lapiz.Map.getter(obj, function foo(){
@@ -206,19 +205,72 @@ Lapiz.Test("CollectionsHelper/Getter", function(t){
   obj.foo === 2 || t.error("Expected 2");
 });
 
+Lapiz.Test("CollectionsHelper/Getter/NamedStr", function(t){
+  var obj = {};
+  var ctr = 0;
+  Lapiz.Map.getter(obj, "foo", function(){
+    var c = ctr;
+    ctr +=1;
+    return c;
+  });
+
+  obj.foo === 0 || t.error("Expected 0");
+  obj.foo === 1 || t.error("Expected 1");
+  obj.foo === 2 || t.error("Expected 2");
+});
+
+Lapiz.Test("CollectionsHelper/Getter/Array", function(t){
+  var obj = {};
+  var ctr = 0;
+  Lapiz.Map.getter(obj, [
+    function foo(){
+      var c = ctr;
+      ctr +=1;
+      return c;
+    },
+    function bar(){
+      return "bar";
+    }
+  ]);
+
+  obj.foo === 0     || t.error("Expected 0");
+  obj.foo === 1     || t.error("Expected 1");
+  obj.foo === 2     || t.error("Expected 2");
+  obj.bar === "bar" || t.error("Expected 'bar'");
+});
+
+Lapiz.Test("CollectionsHelper/Getter/Object", function(t){
+  var obj = {};
+  var ctr = 0;
+  Lapiz.Map.getter(obj, {
+    "foo": function(){
+      var c = ctr;
+      ctr +=1;
+      return c;
+    },
+    "bar": function(){
+      return "bar";
+    }
+  });
+
+  obj.foo === 0     || t.error("Expected 0");
+  obj.foo === 1     || t.error("Expected 1");
+  obj.foo === 2     || t.error("Expected 2");
+  obj.bar === "bar" || t.error("Expected 'bar'");
+});
+
 Lapiz.Test("CollectionsHelper/SetterGetter", function(t){
   var obj = {};
-  Lapiz.Map.setterGetter(obj, "foo", function(i){return parseInt(i);});
-  Lapiz.Map.setterGetter(obj, "money", "number", function(val){
+  Lapiz.Map.setterGetter(obj, "foo", 12, function(i){return parseInt(i);});
+  Lapiz.Map.setterGetter(obj, "money", 5.67333, "number", function(val){
     return "$" + (val.toFixed(2));
   });
 
-  obj.foo = 12;
   obj.foo === 12 || t.error("Expected 12");
-
   obj.foo = "22";
   obj.foo === 22 || t.error("Expected 22");
 
+  obj.money === "$5.67" || t.error ("Expected $5.67 got: " + obj.money);
   obj.money = 13;
   obj.money === "$13.00" || t.error ("Expected $13.00 got: " + obj.money);
 });

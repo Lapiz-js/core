@@ -23,16 +23,22 @@
 
     p.string("test") === "test"   || t.error("string to string failed");
     p.string() === ""             || t.error("undefined to string failed");
+    p.string(NaN) === ""          || t.error("NaN to string failed");
     p.string(10) === "10"         || t.error("string to string failed");
     functionRe.test(funcToString) || t.error("function to string failed, got: " + funcToString );
     objStr === "obj"              || t.error("object with str function failed, got: " + objStr);
   });
 
   Lapiz.Test("Parse/Bool", function(t){
-    p.bool(true) === true   || t.error("true to true failed");
-    p.bool(false) === false || t.error("false to false failed");
-    p.bool("test") === true || t.error("string to bool failed")
-    p.bool("") === false    || t.error("empty string to bool failed")
+    p.bool(true) === true     || t.error("true to true failed");
+    p.bool(false) === false   || t.error("false to false failed");
+    p.bool("test") === true   || t.error("string to bool failed");
+    p.bool("") === false      || t.error("empty string to bool failed");
+    p.bool("0") === false     || t.error("'0' string to bool failed");
+    p.bool("FaLsE") === false || t.error("false string to bool failed");
+
+    p.strictBool("0") === true     || t.error("'0' string to strictBool failed");
+    p.strictBool("FaLsE") === true || t.error("false string to strictBool failed");
   });
 
   Lapiz.Test("Parse/Object", function(t){
