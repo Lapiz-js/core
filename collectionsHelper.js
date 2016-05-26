@@ -13,18 +13,21 @@ Lapiz.Module("Collections", function($L){
   $L.set($L, "Map", Map);
 
   // > Lapiz.Map.meth(obj, namedFunc)
+  // > Lapiz.Map.meth(obj, name, function)
   // Attaches a method to an object. The method must be a named function.
   /* >
   var x = Lapiz.Map();
   Lapiz.Map.meth(x, function foo(){...});
   x.foo(); //calls foo
   */
-  $L.set(Map, "meth", function(obj, name, fn){
+  $L.set(Map, function meth(obj, name, fn){
     if (name === undefined && $L.typeCheck.func(obj)){
+      // common special case: user forgot obj, attached named function
+      // we can provide a very specific and helpful error
       $L.Err.throw("Meth called without object: "+obj.name);
     }
     if ($L.typeCheck.func(fn) && $L.typeCheck.string(name)){
-      $L.assert(name !=="", "Meth name cannot be empty string");
+      $L.assert(name !== "", "Meth name cannot be empty string");
     } else if ($L.typeCheck.func(name) && name.name !== ""){
       fn = name;
       name = fn.name;
@@ -41,6 +44,7 @@ Lapiz.Module("Collections", function($L){
   });
 
   // > Lapiz.Map.setterMethod(obj, namedSetterFunc)
+  // > Lapiz.Map.setterMethod(obj, name, setterFunc)
   // Attaches a setter method to an object. The method must be a named function.
   /* >
   var x = Lapiz.Map();
@@ -299,7 +303,7 @@ Lapiz.Module("Collections", function($L){
   */
   Map.meth($L, function each(obj, fn){
     var i;
-    if (obj instanceof Array){
+    if ($L.typeCheck.array(obj)){
       var l = obj.length;
       for(i=0; i<l; i+=1){
         if (fn(obj[i], i)) {return i;}

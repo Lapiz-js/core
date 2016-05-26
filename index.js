@@ -18,7 +18,7 @@ Lapiz.Module("Index", function($L){
   $L.set($L, "Index", function(cls, primaryFunc, domain){
     if (primaryFunc === undefined){
       primaryFunc = function(obj){return obj.id;};
-    } else if (typeof primaryFunc === "string"){
+    } else if ($L.typeCheck.string(primaryFunc)){
       primaryFunc = function(field){
         return function(obj){
           return obj[field];
