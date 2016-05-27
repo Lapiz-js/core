@@ -7,7 +7,7 @@ Lapiz.Module("Errors", ["Events"], function($L){
   // > Lapiz.on.error( errHandler(err) )
   // > Lapiz.on.error = errHandler(err)
   // Register an error handler to listen for errors thrown with Lapiz.Err.throw
-  var errEvent = $L.Event.linkProperty($L.on, "error");
+  var _errEvent = $L.Event.linkProperty($L.on, "error");
 
   // > Lapiz.Err.throw(Error)
   // > Lapiz.Err.throw(errString)
@@ -16,13 +16,8 @@ Lapiz.Module("Errors", ["Events"], function($L){
   $L.set($L.Err, "throw", function(err){
     if ($L.typeCheck.string(err)){
       err = new Error(err);
-      // peel one layer off the stack because it will always be
-      // this line
-      err.stack = err.stack.split("\n");
-      err.stack.shift();
-      err.stack = err.stack.join("\n");
     }
-    errEvent.fire(err);
+    _errEvent.fire(err);
     throw err;
   });
 

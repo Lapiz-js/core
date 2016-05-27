@@ -37,23 +37,21 @@ Lapiz.Test("Errors/LogTo", ["Errors/Throw"], function(t){
 });
 
 Lapiz.Test("Errors/Assert", ["Init/Assert"], function(t){
-  var err
+  var errMsg
   try{
     Lapiz.assert(false, "TESTING");
   } catch(e){
-    err = e;
+    errMsg = e.message;
   }
-  err.stack = err.stack.split("\n");
-  err.stack[0].indexOf("lapiz/core/init.js") === -1 || t.error("Should have removed one layer from the stack");
+  errMsg === "TESTING" || t.error("Did not throw error");
 });
 
 Lapiz.Test("Errors/TypeCheck", ["Init/TypeCheck/"], function(t){
-  var err
+  var errMsg
   try{
     Lapiz.typeCheck.func(false, "TESTING");
   } catch(e){
-    err = e;
+    errMsg = e.message;
   }
-  err.stack = err.stack.split("\n");
-  err.stack[0].indexOf("lapiz/core/init.js") === -1 || t.error("Should have removed two layer from the stack");
+  errMsg === "TESTING" || t.error("Did not throw error");
 });
