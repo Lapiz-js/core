@@ -28,16 +28,52 @@ Lapiz.Test("Init/TypeCheck/Helpers", function(t){
   var str = "test";
   var arr = [3,1,4];
   var num = 12;
+  var obj = {};
+  var errMsg;
 
   Lapiz.typeCheck.func(fn)    || t.error("Expected true");
   Lapiz.typeCheck.array(arr)  || t.error("Expected true");
   Lapiz.typeCheck.string(str) || t.error("Expected true");
   Lapiz.typeCheck.number(num) || t.error("Expected true");
+  Lapiz.typeCheck.obj(obj) || t.error("Expected true");
 
   !Lapiz.typeCheck.func(arr)  || t.error("Expected false");
   !Lapiz.typeCheck.array(fn)  || t.error("Expected false");
   !Lapiz.typeCheck.string(fn) || t.error("Expected false");
   !Lapiz.typeCheck.number(fn) || t.error("Expected false");
+  !Lapiz.typeCheck.obj(fn) || t.error("Expected false");
+
+
+  try{
+    Lapiz.typeCheck.func(arr, "testing func");
+  } catch(err){
+    errMsg = err.message;
+  }
+  errMsg === "testing func" || t.error("Did not get correct error, expected 'testing func'");
+  try{
+    Lapiz.typeCheck.array(fn, "testing array");
+  } catch(err){
+    errMsg = err.message;
+  }
+  errMsg === "testing array" || t.error("Did not get correct error, expected 'testing array'");
+  try{
+    Lapiz.typeCheck.string(fn, "testing string");
+  } catch(err){
+    errMsg = err.message;
+  }
+  errMsg === "testing string" || t.error("Did not get correct error, expected 'testing string'");
+  try{
+    Lapiz.typeCheck.number(fn, "testing number");
+  } catch(err){
+    errMsg = err.message;
+  }
+  errMsg === "testing number" || t.error("Did not get correct error, expected 'testing number'");
+  try{
+    Lapiz.typeCheck.obj(fn, "testing obj");
+  } catch(err){
+    errMsg = err.message;
+  }
+  errMsg === "testing obj" || t.error("Did not get correct error, expected 'testing obj'");
 });
 
 Lapiz.Test("Init/TypeCheck/Nested", function(t){
@@ -94,6 +130,19 @@ Lapiz.Test("Init/Set", function(t){
   } catch(err){
     errMsg = err.message;
   }
-
   errMsg === "Attempting to set read-only property foo" || t.error("Did not throw error attempting to set foo");
+
+  try {
+    Lapiz.set(obj);
+  } catch(err){
+    errMsg = err.message;
+  }
+  errMsg === "Attempting to call Lapiz.set without name" || t.error("Did not throw error attempting to call Lapiz.set without name");
+
+  try {
+    Lapiz.set(obj, "lorum");
+  } catch(err){
+    errMsg = err.message;
+  }
+  errMsg === "Attempting to call Lapiz.set without value" || t.error("Did not throw error attempting to call Lapiz.set without value");
 });
