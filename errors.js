@@ -1,4 +1,4 @@
-Lapiz.Module("Errors", ["Events"], function($L){
+Lapiz.Module("Errors", ["Events", "Collections"], function($L){
 
   // > Lapiz.Err
   // Namespace for error handling.
@@ -52,5 +52,4 @@ Lapiz.Module("Errors", ["Events"], function($L){
     }
     return newVal;
   });
-
 });

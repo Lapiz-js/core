@@ -1,62 +1,3 @@
-Lapiz.Test("CollectionsHelper/Namespace/Set", function(t){
-  var ns = Lapiz.Namespace();
-  ns.set("foo","bar");
-
-  ns.namespace.foo === "bar" || t.error('Expected namespace.foo === "bar"');
-});
-
-Lapiz.Test("CollectionsHelper/Namespace/Getter", function(t){
-  var ns = Lapiz.Namespace();
-  var bar = "star";
-  ns.getter(function foo(){
-    return bar;
-  });
-
-  ns.namespace.foo === "star" || t.error('Expected namespace.foo === "star"');
-  bar = "car";
-  ns.namespace.foo === "car" || t.error('Expected namespace.foo === "car"');
-});
-
-Lapiz.Test("CollectionsHelper/Namespace/SetterGetter", function(t){
-  var ns = Lapiz.Namespace();
-  ns.setterGetter("foo", 12, "int");
-
-  ns.namespace.foo === 12 || t.error('Expected namespace.foo === 12');
-
-  ns.namespace.foo = 3.1415;
-  ns.namespace.foo === 3 || t.error('Expected namespace.foo === 3');
-});
-
-Lapiz.Test("CollectionsHelper/Namespace/Method", function(t){
-  var ns = Lapiz.Namespace();
-  ns.meth(function foo(){
-    return "bar";
-  });
-
-  ns.namespace.foo() === "bar" || t.error('Expected namespace.foo() === "bar"');
-});
-
-Lapiz.Test("CollectionsHelper/Namespace/Prop", function(t){
-  var ns = Lapiz.Namespace();
-  ns.prop("foo", {"value":"bar"});
-
-  ns.namespace.foo === "bar" || t.error('Expected namespace.foo === "bar"');
-});
-
-Lapiz.Test("CollectionsHelper/Namespace/SetterMethod", function(t){
-  var ns = Lapiz.Namespace();
-  var test = false;
-  ns.setterMethod(function foo(val){
-    test = val;
-  });
-
-  ns.namespace.foo = "test 1";
-  test === "test 1" || t.error('Expected "test 1"');
-
-  ns.namespace.foo("test 2");
-  test === "test 2" || t.error('Expected "test 2"');
-});
-
 Lapiz.Test("CollectionsHelper/Has", function(t){
   var foo = {"bar" : undefined};
 
@@ -149,18 +90,6 @@ Lapiz.Test("CollectionsHelper/ObjectEachFind", function(t){
   name === undefined || t.error("Expected undefined, got: "+role);
 });
 
-Lapiz.Test("CollectionsHelper/NamespaceConstructor", function(t){
-  var foo = Lapiz.Namespace(function(){
-    this.meth(function hello(name){
-      return "Hello, "+name;
-    });
-    this.set("foo", "bar");
-  });
-
-  foo.hello("Adam") === "Hello, Adam" || t.error("Expected 'Hello, Adam'");
-  foo.foo === "bar"                   || t.error("Expected 'bar'");
-});
-
 Lapiz.Test("CollectionsHelper/Method", function(t){
   var obj = {};
   var flag = "failed";
@@ -189,6 +118,22 @@ Lapiz.Test("CollectionsHelper/SetterMethod", function(t){
 
   obj.foo = "pass B";
   flag === "pass B" || t.error("Expected 'pass B'");
+});
+
+Lapiz.Test("CollectionsHelper/BindSetterMethod", function(t){
+  var obj = {
+    flag: "failed"
+  };
+  Lapiz.Map.setterMethod(obj, function foo(val){
+    this.flag = val;
+  }, obj);
+
+  var fn = obj.foo
+  fn("pass A");
+  obj.flag === "pass A" || t.error("Expected 'pass A': got: " + obj.flag);
+
+  obj.foo = "pass B";
+  obj.flag === "pass B" || t.error("Expected 'pass B' got: " + obj.flag);
 });
 
 Lapiz.Test("CollectionsHelper/Getter/NamedFunc", function(t){
@@ -320,4 +265,112 @@ Lapiz.Test("CollectionsHelper/BadConstructorsTest", function(t){
   errMsg(function(){Lapiz.Map.setterMethod({}, "", function(){});}) === "SetterMethod name cannot be empty string" || t.error("Expected setterMethod error");
   errMsg(function(){Lapiz.Map.getter(function foo(){});}) === "Getter called without object: foo" || t.error("Expected getter error");
   errMsg(function(){Lapiz.Map.getter({}, "", function(){});}) === "Getter name cannot be empty string" || t.error("Expected setterMethod error");
+  errMsg(function(){Lapiz.Map.setProperties();}) === "Got undefined for obj in setProperties" || t.error("Expected setProperties error");
+  
+  var em = errMsg(function(){
+    var p = {};
+    Lapiz.Map.binder(p, function foo(){});
+    p.foo = "test";
+  })
+  em === "Cannot reassign method foo" || t.error("Expected binder error");
+});
+
+Lapiz.Test("CollectionsHelper/SetterFactory", function(t){
+  var self = {};
+  var attr = {};
+
+  var flag1 = false;
+  function callback1(){
+    flag1 = "Test 1";
+  };
+
+  var flag2 = false;
+  function callback2(){
+    flag2 = "Test 2";
+  }
+
+  function setter(val){
+    this.callback = callback2;
+    return Lapiz.parse.int(val);
+  }
+
+  self.foo = Lapiz.Map.setterFactory(self, attr, "foo", setter, callback1)
+  self.foo("22");
+
+  attr.foo === 22    || t.error("Expected 22");
+  flag1 === "Test 1" || t.error("Expected 'Test 1'");
+  flag2 === "Test 2" || t.error("Expected 'Test 2'");
+});
+
+Lapiz.Test("CollectionsHelper/Namespace/Set", function(t){
+  var ns = Lapiz.Namespace(function(){
+    this.set("A", "apple");
+  });
+  ns.A === "apple" || t.error("Expected 'apple', got "+ns.A);
+});
+
+Lapiz.Test("CollectionsHelper/Namespace/Meth", function(t){
+  var bar;
+  var ns = Lapiz.Namespace(function(){
+    this.setterMethod(function foo(val){
+      bar = val;
+    });
+  });
+
+  ns.foo = "A";
+  bar === "A" || t.error("Expected 'A'");
+  ns.foo("B");
+  bar === "B" || t.error("Expected 'B'");
+});
+
+Lapiz.Test("CollectionsHelper/Namespace/SetterMethod", function(t){
+  var ns = Lapiz.Namespace(function(){
+    this.setterMethod(function foo(){
+      return "Foo";
+    });
+  });
+  ns.foo() === "Foo" || t.error("Expected 'Foo'");
+});
+
+Lapiz.Test("CollectionsHelper/Namespace/Properties", function(t){
+  var errStr = false;
+
+  var ns = Lapiz.Namespace(function(){
+    this.properties({
+      "*id" : "int",
+      "name": {
+        "get": function(){ return this.attr.name; },
+        "set": Lapiz.parse.string
+      },
+      "age" : "int",
+      "*foo" : {
+        "get": function(){ return "Foo";}
+      }
+    },{
+      "id"  : 12,
+      "name": "Adam",
+      "age" : 32
+    });
+
+    try {
+      this.properties({
+        "bar": undefined
+      });
+    } catch(err){
+      errStr = err.message;
+    }
+  });
+
+  ns.foo === "Foo" || t.error("Expected 'Foo', got " + ns.foo);
+  ns.id === 12     || t.error("Expected 12, got " + ns.id);
+  errStr === "Invalid value for 'bar'" || t.error("Expected error");
+
+  errStr = false;
+  try {
+    ns.id = 123;
+  } catch(err){
+    errStr = err.message;
+  }
+  ns.id === 12 || t.error("Expected 12, got " + ns.id);
+  errStr === "Cannot set readonly property" || t.error("Expected error");
 });

@@ -54,8 +54,20 @@ var Lapiz = (function ModuleLoaderModule($L){
       name = value.name;
     }
 
-    if (typeof name !== "string"){ throw new Error("Attempting to call Lapiz.set without name"); }
-    if (value === undefined){throw new Error("Attempting to call Lapiz.set without value"); }
+    if (typeof name !== "string"){
+      if ($L.Err){
+        $L.Err.throw("Attempting to call Lapiz.set without name");
+      } else {
+        throw new Error("Attempting to call Lapiz.set without name");
+      }
+    }
+    if (value === undefined){
+      if ($L.Err){
+        $L.Err.throw("Attempting to call Lapiz.set without value");
+      } else {
+        throw new Error("Attempting to call Lapiz.set without value");
+      }
+    }
     var setErr = "Attempting to set read-only property "+name;
     Object.defineProperty(obj, name, {
       "get": function(){ return value; },

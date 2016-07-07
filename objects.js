@@ -2,6 +2,9 @@
 // properties so that they can be rearranged if necessary.
 Lapiz.Module("Objects", ["Events"], function($L){
 
+  // > $L.tis(obj, fn)
+  // Same thing as bind, should be refactored out. Also, moving towards adding
+  // bind options to the Map methods.
   $L.Map.meth($L, function tis(self, fn){
     $L.typeCheck.func(fn, "Lapiz.tis requires function as second argument");
     var wrapped = function(){
