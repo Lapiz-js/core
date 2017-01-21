@@ -15,23 +15,27 @@ Lapiz.Module("Index", function($L){
   // By default, the Index methods will be attached directly to the class. If
   // this would cause a namespace collision, a string can be provided as a
   // domain and all methods will be attached in that namespace.
+  //
+  // The class does not have to be a lapizClass, but it must have a similar
+  // interface. Specifically, it must have cls.on.change and the instances of
+  // the class must have obj.on.change and obj.on.delete.
   $L.set($L, "Index", function(cls, primaryFunc, domain){
     if (primaryFunc === undefined){
-      primaryFunc = function(obj){return obj.id;};
+      primaryFunc = function(obj){return obj[$L.Index.defaultPrimary];};
     } else if ($L.typeCheck.string(primaryFunc)){
       primaryFunc = function(field){
         return function(obj){
           return obj[field];
         };
       }(primaryFunc);
-    } else if ( !(primaryFunc instanceof  Function) ){
+    } else if ( !$L.typeCheck.func(primaryFunc) ){
       Lapiz.Err.throw("Expected a function or string");
     }
 
     if (domain === undefined) {
       domain = cls;
     } else {
-      cls[domain] = {};
+      cls[domain] = $L.Map();
       domain = cls[domain];
     }
 
@@ -102,7 +106,11 @@ Lapiz.Module("Index", function($L){
 
   // > Lapiz.Index.Class(constructor, primaryFunc, domain)
   // Shorthand helper, constructor for an indexed class.
-  $L.Map.meth($L.Index, function Class(constructor, primaryFunc, domain){
-    return Lapiz.Index(Lapiz.Class(constructor), primaryFunc, domain);
+  $L.Map.meth($L.Index, function Cls(constructor, primaryFunc, domain){
+    return Lapiz.Index(Lapiz.Cls(constructor), primaryFunc, domain);
   });
+
+  // > Lapiz.Index.defaultPrimary
+  // Sets the default primary key name. It defaults to "id".
+  $L.Index.defaultPrimary = "id";
 });

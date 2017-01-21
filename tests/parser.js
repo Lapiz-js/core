@@ -56,7 +56,7 @@
     intArr[2] === 4 || t.error("Error at 2");
   });
 
-  Lapiz.Test("Parse/ParseFunc", ["Parse/Int"], function(t){
+  Lapiz.Test("Parse/ParseFunc", ["Parse/Array"], function(t){
     var parser = Lapiz.parse("int");
 
     Lapiz.typeCheck.func(parser)     || t.error("Expected function");
@@ -69,5 +69,10 @@
     arr[0] === 5     || t.error("expected 5");
     arr[1] === 4     || t.error("expected 4");
     arr[2] === -12   || t.error("expected -12");
+
+    arr = Lapiz.parse("array|array|int", [[3.14, "1", 4.00005],[5/4, 5, 9],["2.01", 6, "5.2222"]]);
+    arr[0][0] === 3 || t.error("expected 3");
+    arr[1][1] === 5 || t.error("expected 5");
+    arr[2][2] === 5 || t.error("expected 5");
   });
 })();

@@ -1,3 +1,5 @@
+// This may seem odd, but if something (most likely testing) has initilized
+// Lapiz prior to this, we won't clobber it.
 var Lapiz = (function($L) {
   return $L || Object.create(null);
 }(Lapiz));
@@ -12,20 +14,9 @@ Lapiz.Module("Foo", ["Events"], function($L){
   $L.set($L, "foo", "bar");
 });
 */
-var Lapiz = (function ModuleLoaderModule($L){
+(function ModuleLoaderModule($L){
   var _loaded = Object.create(null);
   var _pending = [];
-
-  function _checkReqs(reqs){
-    var notLoaded = [];
-    var i;
-    for(i=0; i<reqs.length; i++){
-      if (_loaded[reqs[i]] === undefined){
-        notLoaded.push(reqs[i]);
-      }
-    }
-    return notLoaded;
-  };
 
   // > Lapiz.set(obj, name, value)
   // > Lapiz.set(obj, namedFunction)
@@ -39,7 +30,7 @@ var Lapiz = (function ModuleLoaderModule($L){
 
   var y = {};
   Lapiz.set(y, "foo", function{...});
-  y.foo = 12; // this will not override the method
+  y.foo = 12; // this will not override the method and will throw an error
   */
 
   // *, str, *                     => named prop
@@ -47,7 +38,6 @@ var Lapiz = (function ModuleLoaderModule($L){
   // str, str, undefined           => probably forgot obj, intended named prop
   // namedFn, undefined, undefined => probably forgot obj, intended namedFn
   function set(obj, name, value){
-    var getFn;
     if (value === undefined && typeof name === "function" && name.name !== ""){
       // name is a named function
       value = name;
@@ -100,6 +90,17 @@ var Lapiz = (function ModuleLoaderModule($L){
       _updatePending(ready[i].name);
     }
   }
+
+  function _checkReqs(reqs){
+    var notLoaded = [];
+    var i;
+    for(i=0; i<reqs.length; i++){
+      if (_loaded[reqs[i]] === undefined){
+        notLoaded.push(reqs[i]);
+      }
+    }
+    return notLoaded;
+  };
 
   $L.set($L, "Module", function(name, reqs, module){
     //Not doing detailed checks here. If you're writing a module, you should be able to load it correctly.
@@ -225,7 +226,7 @@ var Lapiz = (function ModuleLoaderModule($L){
   $L.set($L, "assert", function(bool, err){
     if (!bool){
       err = new Error(err);
-      // peel one layer off the stack because it iwll always be
+      // peel one layer off the stack because it will always be
       // this line
       err.stack = err.stack.split("\n");
       err.stack.shift();
@@ -237,6 +238,4 @@ var Lapiz = (function ModuleLoaderModule($L){
       }
     }
   });
-
-  return $L;
 })(Lapiz);

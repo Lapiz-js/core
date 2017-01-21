@@ -115,12 +115,12 @@ Lapiz.Module("Events", ["Collections"], function($L){
   });
 
   // > Lapiz.Event.linkProperty(obj, name, evt)
+  // > Lapiz.Event.linkProperty(obj, name)
   // This is a helper function for linking an event to an object. It will be
   // linked like a setter method:
   /* >
-  var e = Lapiz.Event();
   var map = Lapiz.Map();
-  Lapiz.Event.linkProperty(map, "foo", e);
+  var e = Lapiz.Event.linkProperty(map, "foo");
   // These two are the same
   map.foo(function(){...});
   map.foo = function(){...};
@@ -128,6 +128,7 @@ Lapiz.Module("Events", ["Collections"], function($L){
   // To deregister
   map.foo.deregister(fn);
   */
+  // If no event is given, one is created. The even is returned (either way).
   $L.set($L.Event, "linkProperty", function(obj, name, evt){
     if (evt === undefined){
       evt = $L.Event();

@@ -275,6 +275,46 @@ Lapiz.Test("CollectionsHelper/BadConstructorsTest", function(t){
   em === "Cannot reassign method foo" || t.error("Expected binder error");
 });
 
+Lapiz.Test("CollectionsHelper/SetProperties", function(t){
+  var obj = Lapiz.Map();
+  var attr = Lapiz.Map();
+  var change = Lapiz.Event();
+  var setterEvt = Lapiz.Event();
+  Lapiz.Map.setProperties(obj, attr, {
+    "*id": "int",
+    "name": "string", 
+    "foo": function(val){
+      if (val === attr['foo']){
+        this.set = false;
+      }
+      this.callback = setterEvt.fire;
+      return val;
+    }
+  }, change.fire);
+
+  var inc = 0;
+  change.register(function(){
+    inc++;
+  });
+
+  var setterEvtCalled = false;
+  setterEvt.register(function(){
+    setterEvtCalled = true;
+  })
+
+  obj.id = 21;
+  obj.id === 21    || t.error("Wrong ID");
+  inc === 1        || t.error("inc should be 1");
+  !setterEvtCalled || t.error("SetterEvt should not have been called")
+
+  obj.foo = 'test';
+  obj.foo === 'test' || t.error("Expected 'test'");
+  inc === 2          || t.error("inc should be 2");
+  setterEvtCalled    || t.error("SetterEvt should have been called")
+  obj.foo = 'test';
+  inc === 2          || t.error("inc should still be 2");
+});
+
 Lapiz.Test("CollectionsHelper/SetterFactory", function(t){
   var self = {};
   var attr = {};
@@ -307,9 +347,11 @@ Lapiz.Test("CollectionsHelper/Namespace/Set", function(t){
     this.set("A", "apple");
   });
   ns.A === "apple" || t.error("Expected 'apple', got "+ns.A);
+  ns.A = "banana"
+  ns.A === "apple" || t.error("Still expected 'apple', got "+ns.A);
 });
 
-Lapiz.Test("CollectionsHelper/Namespace/Meth", function(t){
+Lapiz.Test("CollectionsHelper/Namespace/SetterMethod", function(t){
   var bar;
   var ns = Lapiz.Namespace(function(){
     this.setterMethod(function foo(val){
@@ -323,9 +365,9 @@ Lapiz.Test("CollectionsHelper/Namespace/Meth", function(t){
   bar === "B" || t.error("Expected 'B'");
 });
 
-Lapiz.Test("CollectionsHelper/Namespace/SetterMethod", function(t){
+Lapiz.Test("CollectionsHelper/Namespace/Meth", function(t){
   var ns = Lapiz.Namespace(function(){
-    this.setterMethod(function foo(){
+    this.meth(function foo(){
       return "Foo";
     });
   });
@@ -343,9 +385,7 @@ Lapiz.Test("CollectionsHelper/Namespace/Properties", function(t){
         "set": Lapiz.parse.string
       },
       "age" : "int",
-      "*foo" : {
-        "get": function(){ return "Foo";}
-      }
+      "+foo" : function(){ return "Foo"; }
     },{
       "id"  : 12,
       "name": "Adam",
@@ -361,9 +401,18 @@ Lapiz.Test("CollectionsHelper/Namespace/Properties", function(t){
     }
   });
 
-  ns.foo === "Foo" || t.error("Expected 'Foo', got " + ns.foo);
-  ns.id === 12     || t.error("Expected 12, got " + ns.id);
+  ns.foo === "Foo"                     || t.error("Expected 'Foo', got " + ns.foo);
+  ns.id === 12                         || t.error("Expected 12, got " + ns.id);
   errStr === "Invalid value for 'bar'" || t.error("Expected error");
+
+  errStr = false;
+  try {
+    ns.foo = "test";
+  } catch(err){
+    errStr = err.message;
+  }
+  errStr === "Cannot set readonly property" || t.error("Expected error");
+  ns.foo === "Foo"                          || t.error("Expected 'Foo', got " + ns.foo);
 
   errStr = false;
   try {
@@ -373,4 +422,13 @@ Lapiz.Test("CollectionsHelper/Namespace/Properties", function(t){
   }
   ns.id === 12 || t.error("Expected 12, got " + ns.id);
   errStr === "Cannot set readonly property" || t.error("Expected error");
+});
+
+Lapiz.Test("CollectionsHelper/ArgMap", function(t){
+  var coord = function(x,y){
+    return Lapiz.argMap();
+  }(3,4);
+
+  coord['x'] === 3 || t.error("expected 3");
+  coord['y'] === 4 || t.error("expected 4");
 });

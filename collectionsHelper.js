@@ -12,6 +12,16 @@ Lapiz.Module("Collections", function($L){
   }
   $L.set($L, "Map", Map);
 
+  // > Lapiz.getFnName(fn)
+  // Returns the name of a function. Throws an error if the function is
+  // anoymous. Also strips "bound" off the front of bound functions.
+  $L.set($L, function getFnName(fn){
+    var name = fn.name;
+    $L.assert(name !== "", "Expected named function, got anonymous");
+    name = name.split(" ").pop();
+    return name;
+  });
+
   // > Lapiz.Map.meth(obj, namedFunc)
   // > Lapiz.Map.meth(obj, name, function)
   // > Lapiz.Map.meth(obj, namedFunc, bind)
@@ -46,7 +56,7 @@ Lapiz.Module("Collections", function($L){
     } else if ($L.typeCheck.func(name) && name.name !== ""){
       bind = fn;
       fn = name;
-      name = fn.name;
+      name = $L.getFnName(fn);
     } else {
       Lapiz.Err['throw']("Meth requires either name and func or named function");
     }
@@ -263,6 +273,29 @@ Lapiz.Module("Collections", function($L){
       //todo: add test for fireChange and event
       // > lapizObject.properties:setterInterface
       // The 'this' property of a setter will be the setter interface
+      /* >
+        var obj = $L.Map();
+        var attr = $L.Map();
+        $L.Map.setProperties(obj, attr,{
+          "*id": "int",
+          "foo": function(val){
+            // 'this' is not the setterInterface
+            if (val === attr['foo']){
+              // can suppress set and fire
+              this.set = false;
+            }
+            if (val === "quite"){
+              // can suppress fire (but will still set)
+              this.fire = false;
+            }
+            if ($L.typeCheck.func(val)){
+              // can set a callback that will invoked:
+              // callback(obj, 'foo', val, oldVal)
+              this.callback = val;
+            }
+          }
+        })
+      */
       var setterInterface = {
         // > lapizObject.properties:setterInterface.set
         // Setting this to false will prevent the set and event fire
@@ -286,65 +319,97 @@ Lapiz.Module("Collections", function($L){
     };
   });
 
-  var _setReadOnly = function(){ $L.Err.throw("Cannot set readonly property"); };
+  function _setReadOnly(){ $L.Err.throw("Cannot set readonly property"); };
 
+  function _setOnce(setter){
+    var isSet = false;
+    return function(val){
+      if (isSet){
+        _setReadOnly();
+      }
+      isSet = true;
+      return setter(val);
+    };
+  }
+
+  // > Lapiz.Map.setProperties(obj, attr, properties, values, callback)
   // > Lapiz.Map.setProperties(obj, attr, properties, values)
+  // > Lapiz.Map.setProperties(obj, attr, properties, callback)
   // > Lapiz.Map.setProperties(obj, attr, properties)
   // Defines properties on an object and puts the underlying value in the
-  // attributes collection.
-  Map.meth(Map, function setProperties(obj, attr, properties, values){
+  // attributes collection. If callback is defined, it will be called whenever
+  // any of the setters is invoked.
+  Map.meth(Map, function setProperties(obj, attr, properties, values, callback){
     if (obj === undefined){
       $L.Err.throw("Got undefined for obj in setProperties");
     }
-    var property, val, i, desc, getterProp, setterFn;
+    if (callback === undefined && $L.typeCheck.func(values)){
+      callback = values;
+      values = undefined;
+    }
+    var property, val, i, desc, isSetOnce, isGetter;
     var keys = Object.keys(properties);
     for(i=keys.length-1; i>=0; i-=1){
       property = keys[i];
       val = properties[property];
-      desc = {};
+      desc = $L.Map();
 
-      // If the property name begins with *, it is a getter, the setter will not
-      // be defined on obj.
-      getterProp = false;
-      if (property[0] === "*"){
+      if (property[0] === "+"){
         property = property.slice(1);
-        getterProp = true;
-      }
-
-      if (val === undefined || val === null){
-        $L.Err.throw("Invalid value for '" + property + "'");
-      } else if ($L.typeCheck.func(val) || $L.typeCheck.string(val)){
-        desc.set = Map.setterFactory(obj, attr, property, val);
-        desc.get = Map.getterFactory(attr, property);
-      } else if (val.set !== undefined || val.get !== undefined) {
-        if (val.set !== undefined){
-          desc.set = Map.setterFactory(obj, attr, property, val.set);
+        if (val === undefined || val === null){
+          desc.get = Map.getterFactory(attr, property);
+        } else if ($L.typeCheck.func(val)){
+          desc.get = val;
         }
-        desc.get = (val.get !== undefined) ? Map.getterFactory(obj, val.get) : Map.getterFactory(obj, property);
-      } else {
-        $L.Err.throw("Could not construct getter/setter for " + property);
-      }
-
-      // If this is a getter, we grab the setter before removing it. This allows
-      // the setProperties method to be used in a set-once manor.
-      setterFn = desc.set;
-      if (getterProp) {
         desc.set = _setReadOnly;
-      }
+        Object.defineProperty(obj, property, desc);
+        if (values && Object.hasOwnProperty.call(values, property) ){
+          attr[property] = values[property]; 
+        }
+      } else {
+        // If the property name begins with *, it is a setOnce, the setter will not
+        // be defined on obj.
+        isSetOnce = false;
+        if (property[0] === "*"){
+          property = property.slice(1);
+          isSetOnce = true;
+        }
 
-      Object.defineProperty(obj, property, desc);
-      if (Object.hasOwnProperty.call(values, property) ){
-        setterFn(values[property]);
+        if (val === undefined || val === null){
+          $L.Err.throw("Invalid value for '" + property + "'");
+        } else if ($L.typeCheck.func(val) || $L.typeCheck.string(val)){
+          desc.set = Map.setterFactory(obj, attr, property, val, callback);
+          desc.get = Map.getterFactory(attr, property);
+        } else if (val.set !== undefined || val.get !== undefined) {
+          if (val.set !== undefined){
+            desc.set = Map.setterFactory(obj, attr, property, val.set, callback);
+          }
+          desc.get = (val.get !== undefined) ? Map.getterFactory(attr, val.get) : Map.getterFactory(attr, property);
+        } else {
+          $L.Err.throw("Could not construct getter/setter for " + property);
+        }
+
+        // If this is a getter, we grab the setter before removing it. This allows
+        // the setProperties method to be used in a set-once manor.
+        if (isSetOnce) {
+          desc.set = _setOnce(desc.set);
+        }
+
+        Object.defineProperty(obj, property, desc);
+        if (values && Object.hasOwnProperty.call(values, property) ){
+          desc.set(values[property]);
+        }
       }
     }
   });
 
-  // > Lapiz.Map.binder(proto, fn)
+  // > Lapiz.Map.binder(proto, namedFn)
+  // > Lapiz.Map.binder(proto, name, fn)
   // Handles late binding for prototype methods
   /* >
   var fooProto = {};
   binder(fooProto, function sayHi(){
-    console.log("Hi, "+name);
+    console.log("Hi, " + this.name);
   });
   var x = {};
   x.__proto__ = fooProto;
@@ -357,16 +422,35 @@ Lapiz.Module("Collections", function($L){
   // without leveraging prototypes, we can create a lot of uncessary functions.
   // With late binding, 'this' will always refer to the original 'this' context,
   // but bound functions will only be generated when they are called or assigned
-  Map.meth(Map, function binder(proto, fn){
-    Object.defineProperty(proto, fn.name, {
+  Map.meth(Map, function binder(proto, name, fn){
+    if (fn === undefined){
+      fn = name;
+      name = fn.name;
+    }
+    $L.typeCheck.func(fn, "Expected fn for binder");
+    if (!$L.typeCheck.string(name) && name !== ""){
+      $L.Err.throw("Invalid name for binder function");
+    }
+    Object.defineProperty(proto, name, {
       get: function(){
-        var bfn = fn.bind(this)
-        $L.Map.meth(this, bfn)
+        var bfn = fn.bind(this);
+        $L.Map.meth(this, name, bfn);
         return bfn;
       },
-      set: function(){ $L.Err.throw("Cannot reassign method "+fn.name); },
+      set: function(){ $L.Err.throw("Cannot reassign method "+name); },
     });
   });
+
+  // > namespace
+  // The "this" object on a Namespace constructor.
+  /*>
+  var foo = Lapiz.Namespace(function(){
+    this.properties(...);
+    this.meth(...);
+    this.set(...);
+    // and so forth
+  });
+  */
 
   // This section builds up the namespace prototype
   var _nsProto = Map();
@@ -387,6 +471,7 @@ Lapiz.Module("Collections", function($L){
   });
 
   // > namespace.set(name, val)
+  // Sets the value as a property on the namespace.
   Map.binder(_nsProto, function set(name, val){
     Object.defineProperty(this.namespace, name, {'value': val});
   });
@@ -407,7 +492,6 @@ Lapiz.Module("Collections", function($L){
   // returned, otherwise the namespace wrapper is returned.
   $L.set($L, function Namespace(fn){
     var self = Object.create(_nsProto);
-    self.__proto__ = _nsProto;
 
     // > namespace.namespace
     // The inner namespace is where all methods and properties are attached, the
@@ -510,6 +594,29 @@ Lapiz.Module("Collections", function($L){
     });
 
     return arr;
+  });
+
+  // > Lapiz.argMap()
+  // This is one of the few "magic methods" in Lapiz. When called from within a
+  // function, it returns the arguments names and values as a map.
+  /* >
+  function foo(x,y,z){
+    var args = Lapiz.argMap();
+    console.log(args);
+  }
+  foo('do','re','mi'); // logs {'x':'do', 'y':'re', 'z':'mi'}
+  */
+  $L.Map.meth($L, function argMap(){
+    var args = arguments.callee.caller.arguments;
+    var argNames = (arguments.callee.caller + "").match(/\([^)]*\)/g);
+    var dict = $L.Map();
+    var i,l;
+    argNames = argNames[0].match(/[\w$]+/g);
+    l = argNames.length;
+    for(i=0; i<l; i+=1){
+      dict[argNames[i]] = args[i];
+    }
+    return dict;
   });
 
 });

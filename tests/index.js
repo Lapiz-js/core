@@ -1,20 +1,23 @@
 (function(){
-  var _Person = function(id, name, role, active){
-    this.properties({
-      "id"    : "int",
-      "name"  : "string",
-      "role"  : "string",
+  var _Person = function(cls){
+    cls.properties({
+      "id": "int",
+      "name": "string",
+      "role": "string",
       "active": "bool",
-    }, Lapiz.argDict());
+    });
 
-    var self = this;
-    this.meth(function del(){
-      self.fire.delete(self.pub);
+    cls.constructor(function(id, name, role, active){
+      this.setMany(Lapiz.argMap());
+    });
+
+    cls.meth(function remove(){
+      this.fire.delete(this.pub);
     });
   };
 
   Lapiz.Test("Index/Index", ["Event/"], function(t){
-    var Person = Lapiz.Class(_Person);
+    var Person = Lapiz.Cls(_Person);
 
     Lapiz.Index(Person);
 
@@ -25,7 +28,7 @@
   });
 
   Lapiz.Test("Index/PrimaryByString", ["Index/Index"], function(t){
-    var Person = Lapiz.Class(_Person);
+    var Person = Lapiz.Cls(_Person);
     var errMsg = false;
     try{
       Lapiz.Index(Person, ["name"]);
@@ -37,7 +40,7 @@
   });
 
   Lapiz.Test("Index/CatchBadConstructor", ["Index/Index"], function(t){
-    var Person = Lapiz.Index.Class(_Person, "name");
+    var Person = Lapiz.Index.Cls(_Person, "name");
 
     Person(50, "Stephen", "admin", true);
     Person(70, "Lauren", "editor", true);
@@ -48,7 +51,7 @@
   });
 
   Lapiz.Test("Index/GetByValue", ["Index/Index"], function(t){
-    var Person = Lapiz.Class(_Person);
+    var Person = Lapiz.Cls(_Person);
 
     Lapiz.Index(Person);
 
@@ -64,7 +67,7 @@
   });
 
   Lapiz.Test("Index/GetByFunc", ["Index/Index"], function(t){
-    var Person = Lapiz.Class(_Person);
+    var Person = Lapiz.Cls(_Person);
 
     Lapiz.Index(Person);
 
@@ -84,7 +87,7 @@
   });
 
   Lapiz.Test("Index/Filter", ["Event/"], function(t){
-    var Person = Lapiz.Class(_Person);
+    var Person = Lapiz.Cls(_Person);
 
     Lapiz.Index(Person);
     var activeAdmins = Person.Filter(function(key, acc){
@@ -106,7 +109,7 @@
   });
 
   Lapiz.Test("Index/IndexChangeEvent", ["Event/"], function(t){
-    var Person = Lapiz.Class(_Person);
+    var Person = Lapiz.Cls(_Person);
     var name;
 
 
@@ -127,7 +130,7 @@
   });
 
   Lapiz.Test("Index/FilterFunc", ["Index/Filter"], function(t){
-    var Person = Lapiz.Class(_Person);
+    var Person = Lapiz.Cls(_Person);
     Lapiz.Index(Person);
 
     Person(5, "Stephen", "admin", true);
@@ -145,7 +148,7 @@
   });
 
   Lapiz.Test("Index/Protected", ["Index/Index"], function(t){
-    var Person = Lapiz.Class(_Person);
+    var Person = Lapiz.Cls(_Person);
 
     Lapiz.Index(Person);
 
@@ -159,7 +162,7 @@
   });
 
   Lapiz.Test("Index/All", ["Index/Index"], function(t){
-    var Person = Lapiz.Class(_Person);
+    var Person = Lapiz.Cls(_Person);
 
     Lapiz.Index(Person);
 
@@ -170,8 +173,8 @@
     Person.all instanceof Function || t.error("Person.all should be a function")
   });
 
-  Lapiz.Test("Index/Delete", ["Index/Index"], function(t){
-    var Person = Lapiz.Class(_Person);
+  Lapiz.Test("Index/remove", ["Index/Index"], function(t){
+    var Person = Lapiz.Cls(_Person);
 
     Lapiz.Index(Person);
 
@@ -179,11 +182,11 @@
     Person(6, "Adam", "admin", true);
     Person(7, "Lauren", "editor", true);
 
-    Person.get(5).del();
+    Person.get(5).remove();
   });
 
   Lapiz.Test("Index/OnInsert", ["Event/"], function(t){
-    var Person = Lapiz.Class(_Person);
+    var Person = Lapiz.Cls(_Person);
     var flag = false;
 
     Lapiz.Index(Person);
@@ -202,7 +205,7 @@
   });
 
   Lapiz.Test("Index/Keys", ["Index/Index"], function(t){
-    var Person = Lapiz.Class(_Person);
+    var Person = Lapiz.Cls(_Person);
 
     Lapiz.Index(Person);
 
@@ -219,7 +222,7 @@
   });
 
   Lapiz.Test("Index/Each", ["Index/Index"], function(t){
-    var Person = Lapiz.Class(_Person);
+    var Person = Lapiz.Cls(_Person);
 
     Lapiz.Index(Person);
 
@@ -241,7 +244,7 @@
   });
 
   Lapiz.Test("Index/FilterOnRemove", ["Index/Filter"], function(t){
-    var Person = Lapiz.Class(_Person);
+    var Person = Lapiz.Cls(_Person);
 
     Lapiz.Index(Person);
     var admins = Person.Filter("role", "admin");
@@ -264,7 +267,7 @@
   });
 
   Lapiz.Test("Index/FilterOnChangeShouldNotFire", ["Index/Filter"], function(t){
-    var Person = Lapiz.Class(_Person);
+    var Person = Lapiz.Cls(_Person);
 
     Lapiz.Index(Person);
     var admins = Person.Filter(function(person){
@@ -284,7 +287,7 @@
   });
 
   Lapiz.Test("Index/FilterOnChangeShouldFire", ["Index/Filter"], function(t){
-    var Person = Lapiz.Class(_Person);
+    var Person = Lapiz.Cls(_Person);
 
     Lapiz.Index(Person);
     var admins = Person.Filter("role", "admin");
@@ -302,27 +305,32 @@
   });
 
   Lapiz.Test("Index/Relational", ["Index/Filter"], function(t){
-    var One = Lapiz.Class(function(id, name){
+    var One = Lapiz.Cls(function(){
       this.properties({
         "id"    : "int",
         "name"  : "string"
-      }, Lapiz.argDict());
+      });
+
+      this.constructor(function(id, name){
+        this.setMany(Lapiz.argMap());
+      });
+
     });
 
     Lapiz.Index(One);
 
-    var Many = Lapiz.Class(function(id, name, parent_id){
+    var Many = Lapiz.Cls(function(id, name, parent_id){
       this.properties({
         "id"        : "int",
         "name"      : "string",
         "parent_id" : "int",
-      }, Lapiz.argDict());
-
-      var self = this.pub;
-      this.getter(function parent(){
-        return One.get(self.parent_id);
+        "+parent"   : function parent(){
+                        return One.get(this.parent_id);
+                      }
       });
-      return self;
+      this.constructor(function(id, name, parent_id){
+        this.setMany(Lapiz.argMap());
+      });
     });
     Lapiz.Index(Many);
 
