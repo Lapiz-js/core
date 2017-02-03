@@ -12,7 +12,7 @@
     });
 
     cls.meth(function remove(){
-      this.fire.delete(this.pub);
+      this.fire.remove(this.pub);
     });
   };
 

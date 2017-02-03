@@ -46,14 +46,14 @@ Lapiz.Module("Foo", ["Events"], function($L){
 
     if (typeof name !== "string"){
       if ($L.Err){
-        $L.Err.throw("Attempting to call Lapiz.set without name");
+        $L.Err.toss("Attempting to call Lapiz.set without name");
       } else {
         throw new Error("Attempting to call Lapiz.set without name");
       }
     }
     if (value === undefined){
       if ($L.Err){
-        $L.Err.throw("Attempting to call Lapiz.set without value");
+        $L.Err.toss("Attempting to call Lapiz.set without value");
       } else {
         throw new Error("Attempting to call Lapiz.set without value");
       }
@@ -144,7 +144,7 @@ Lapiz.Module("Foo", ["Events"], function($L){
   Lapiz.typeCheck("test", Array); // false
   Lapiz.typeCheck([], "string", "Expected string"); // throws an error
   */
-  $L.set($L, "typeCheck", function(obj, type, err){
+  $L.set($L, function typeCheck(obj, type, err){
     var typeCheck = false;
     try{
       typeCheck = (typeof type === "string") ? (typeof obj === type) : (obj instanceof type);
@@ -153,8 +153,8 @@ Lapiz.Module("Foo", ["Events"], function($L){
     }
     if (err !== undefined && !typeCheck){
       err = new Error(err);
-      if ($L.Err && $L.Err.throw){
-        $L.Err.throw(err)
+      if ($L.Err && $L.Err.toss){
+        $L.Err.toss(err)
       } else {
         throw err;
       }
@@ -166,23 +166,23 @@ Lapiz.Module("Foo", ["Events"], function($L){
   // > Lapiz.typeCheck.func(obj, errStr)
   // Checks if the object is a function. If a string is supplied for errStr, it
   // will throw errStr if obj is not a function.
-  $L.set($L.typeCheck, "func", function(obj, err){
+  $L.set($L.typeCheck, function func(obj, err){
     return $L.typeCheck(obj, "function", err);
   });
 
-  // > Lapiz.typeCheck.array(obj)
-  // > Lapiz.typeCheck.array(obj, errStr)
+  // > Lapiz.typeCheck.arr(obj)
+  // > Lapiz.typeCheck.arr(obj, errStr)
   // Checks if the object is a array. If a string is supplied for errStr, it
   // will throw errStr if obj is not an array.
-  $L.set($L.typeCheck, "array", function(obj, err){
+  $L.set($L.typeCheck, function arr(obj, err){
     return $L.typeCheck(obj, Array, err);
   });
 
-  // > Lapiz.typeCheck.string(obj)
-  // > Lapiz.typeCheck.string(obj, errStr)
+  // > Lapiz.typeCheck.str(obj)
+  // > Lapiz.typeCheck.str(obj, errStr)
   // Checks if the object is a string. If a string is supplied for errStr, it
   // will throw errStr if obj is not an string.
-  $L.set($L.typeCheck, "string", function(obj, err){
+  $L.set($L.typeCheck, function str(obj, err){
     return $L.typeCheck(obj, "string", err);
   });
 
@@ -190,7 +190,7 @@ Lapiz.Module("Foo", ["Events"], function($L){
   // > Lapiz.typeCheck.number(obj, errStr)
   // Checks if the object is a number. If a string is supplied for errStr, it
   // will throw errStr if obj is not an number.
-  $L.set($L.typeCheck, "number", function(obj, err){
+  $L.set($L.typeCheck, function number(obj, err){
     return $L.typeCheck(obj, "number", err);
   });
 
@@ -199,7 +199,7 @@ Lapiz.Module("Foo", ["Events"], function($L){
   // Checks if the object is an object. If a string is supplied for errStr, it
   // will throw errStr if obj is not an number. Note that many things like Arrays and
   // Dates are objects, but numbers strings and functions are not.
-  $L.set($L.typeCheck, "obj", function(obj, err){
+  $L.set($L.typeCheck, function obj(obj, err){
     return $L.typeCheck(obj, "object", err);
   });
 
@@ -210,11 +210,11 @@ Lapiz.Module("Foo", ["Events"], function($L){
   // > if (collection.key !== undefined && collection.key.on !== undefined && Lapiz.typeCheck.func(collection.key.on.change)){
   // becomes:
   // > if (Lapiz.typeCheck.nested(collection, "key", "on", "change", "func")){
-  $L.set($L.typeCheck, "nested", function(){
+  $L.set($L.typeCheck, function nested(){
     var args = Array.prototype.slice.call(arguments);
     $L.assert(args.length >= 2, "Lapiz.typeCheck.nested requres at least 2 arguments");
     var typeCheckFn = args.pop();
-    typeCheckFn = $L.typeCheck.string(typeCheckFn) ? $L.typeCheck[typeCheckFn] : typeCheckFn;
+    typeCheckFn = $L.typeCheck.str(typeCheckFn) ? $L.typeCheck[typeCheckFn] : typeCheckFn;
     $L.typeCheck.func(typeCheckFn, "Last argument to Lapiz.typeCheck.nested must be a function or name of a typeCheck helper method");
     var obj;
     for(obj = args.shift(); obj !== undefined && args.length > 0 ; obj = obj[args.shift()]);
@@ -223,7 +223,7 @@ Lapiz.Module("Foo", ["Events"], function($L){
 
   // > Lapiz.assert(bool, err)
   // If bool evaluates to false, an error is thrown with err.
-  $L.set($L, "assert", function(bool, err){
+  $L.set($L, function assert(bool, err){
     if (!bool){
       err = new Error(err);
       // peel one layer off the stack because it will always be
@@ -231,8 +231,8 @@ Lapiz.Module("Foo", ["Events"], function($L){
       err.stack = err.stack.split("\n");
       err.stack.shift();
       err.stack = err.stack.join("\n");
-      if ($L.Err && $L.Err.throw){
-        $L.Err.throw(err);
+      if ($L.Err && $L.Err.toss){
+        $L.Err.toss(err);
       } else {
         throw err;
       }

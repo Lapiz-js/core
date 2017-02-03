@@ -22,7 +22,7 @@ Lapiz.Module("Events", ["Collections"], function($L){
     // > event.register = fn
     // The event.register method takes a function. All registered functions will
     // be called when the event fires.
-    $L.Map.setterMethod(event, function register(fn){
+    $L.set.setterMethod(event, function register(fn){
       $L.typeCheck.func(fn, "Event registration requires a function");
       _listeners.push(fn);
       return fn;
@@ -32,7 +32,7 @@ Lapiz.Module("Events", ["Collections"], function($L){
     // > event.register.deregister = fn
     // The event.register.deregister method takes a function. If that function
     // has been registered with the event, it will be removed.
-    $L.Map.setterMethod(event.register, function deregister(fn){
+    $L.set.setterMethod(event.register, function deregister(fn){
       $L.remove(_listeners, fn);
       return fn;
     });
@@ -41,7 +41,7 @@ Lapiz.Module("Events", ["Collections"], function($L){
     // The event.fire method will call all functions that have been registered
     // with the event. The arguments that are passed into fire will be passed
     // into the registered functions.
-    $L.Map.meth(event, function fire(){
+    $L.set.meth(event, function fire(){
       if (!event.fire.enabled) { return event; }
       var i;
       // make a copy in case _listeners changes during fire event
@@ -58,12 +58,12 @@ Lapiz.Module("Events", ["Collections"], function($L){
     // The event.enabled is a boolean that can be set to enable or disable the
     // fire method. If event.fire.enable is false, even if event.fire is called,
     // it will not call the registered functions.
-    $L.Map.setterGetter(event.fire, "enabled", true, function(enable){ return !!enable; });
+    $L.set.setterGetter(event.fire, "enabled", true, function(enable){ return !!enable; });
 
     // > event.fire.length
     // The event.length is a read-only property that returns the number of
     // functions registered with the event.
-    $L.Map.getter(event.fire, function length(){ return _listeners.length; });
+    $L.set.getter(event.fire, function length(){ return _listeners.length; });
 
     $L.set(event, "_cls", $L.Event);
 
@@ -81,7 +81,7 @@ Lapiz.Module("Events", ["Collections"], function($L){
     var facade = $L.Map();
 
     // > singleEvent.register
-    $L.Map.meth(facade, function register(fn){
+    $L.set.meth(facade, function register(fn){
       if (_hasFired){
         fn.apply(this, _args);
       } else {
@@ -90,13 +90,13 @@ Lapiz.Module("Events", ["Collections"], function($L){
     });
 
     // > singleEvent.register.deregister
-    $L.Map.meth(facade.register, function deregister(fn){
+    $L.set.meth(facade.register, function deregister(fn){
       if (_hasFired) { return; }
       _event.register.deregister(fn);
     });
 
     // > singleEvent.fire
-    $L.Map.meth(facade, function fire(){
+    $L.set.meth(facade, function fire(){
       if (_hasFired || !_event.fire.enabled) { return; }
       _hasFired = true;
       _args = arguments;

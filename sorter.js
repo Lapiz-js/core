@@ -50,7 +50,7 @@ Lapiz.Module("Sorter", function($L){
             return funcOrField.range(a, b, accessor);
           };
         }
-      } else if($L.typeCheck.string(funcOrField)){
+      } else if($L.typeCheck.str(funcOrField)){
         _sortFn = function(a, b){
           a = accessor(a)[funcOrField];
           b = accessor(b)[funcOrField];
@@ -61,7 +61,7 @@ Lapiz.Module("Sorter", function($L){
           return (a > b ? 1 : (b > a ? -1 : 0));
         };
       } else {
-        Lapiz.Err.throw("Sorter function must be omitted, function or field name");
+        Lapiz.Err.toss("Sorter function must be omitted, function or field name");
       }
     }
     setSortFn(funcOrField);
@@ -86,12 +86,12 @@ Lapiz.Module("Sorter", function($L){
     // sorters accessor.
 
     // > sort.length
-    $L.Map.copyProps(self, accessor, "has", "Accessor", "Sort", "Filter", "&length");
+    $L.set.copyProps(self, accessor, "has", "Accessor", "Sort", "Filter", "&length");
 
     // > sort.keys
     // Read-only property. The keys will be in the order that the sorter has
     // arranged them.
-    $L.Map.getter(self, function keys(){
+    $L.set.getter(self, function keys(){
       return _index.slice(0);
     });
 
@@ -128,7 +128,7 @@ Lapiz.Module("Sorter", function($L){
     // > sort.func(field)
     // > sort.func = field
     // Assign a new function or field to sort by;
-    $L.Map.setterMethod(self, function func(funcOrField){
+    $L.set.setterMethod(self, function func(funcOrField){
       setSortFn(funcOrField)
       var oldIndex = _index.slice(0);
       _index.sort(_sortFn);
@@ -199,7 +199,7 @@ Lapiz.Module("Sorter", function($L){
   // because a generic bisecting search is useful in many context. It assumes
   // that the accessor is sorted. It returns the position in index of the first
   // key that is greater than or equal to val in the accessor.
-  $L.Map.meth($L.Sort, function locationOf(val, index, fn, accessor, start, end) {
+  $L.set.meth($L.Sort, function locationOf(val, index, fn, accessor, start, end) {
     //todo: add test
     start = start || 0;
     end = end || index.length;
@@ -222,7 +222,7 @@ Lapiz.Module("Sorter", function($L){
   // because a generic bisecting search is useful in many context. It assumes
   // that the accessor is sorted. It returns the position in index of the first
   // key that is greater than the val in the accessor.
-  $L.Map.meth($L.Sort, function gt(key, index, fn, accessor, start, end){
+  $L.set.meth($L.Sort, function gt(key, index, fn, accessor, start, end){
     //todo: add test
     start = start || 0;
     end = end || index.length;

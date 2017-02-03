@@ -3,30 +3,30 @@ Lapiz.Module("Obj", ["Events"], function($L){
   var _privProto = $L.Map();
 
 
-  // > obj2.properties(props, vals)
+  // > obj.properties(props, vals)
   // Sets properties on the public scopes and stores the attributes in
   // priv.attr.
-  $L.Map.binder(_privProto, function properties(props, vals){
-    $L.Map.setProperties(this.pub, this.attr, props, vals, this.fire.change);
+  $L.set.binder(_privProto, function properties(props, vals){
+    $L.set.setProperties(this.pub, this.attr, props, vals, this.fire.change);
   });
 
-  // > obj2.meth(obj, namedFunc)
-  // > obj2.meth(obj, name, function)
+  // > obj.meth(obj, namedFunc)
+  // > obj.meth(obj, name, function)
   // Sets properties on the public scopes and stores the attributes in
   // priv.attr.
-  $L.Map.binder(_privProto, function meth(name, fn){
-    $L.Map.meth(this.pub, name, fn);
+  $L.set.binder(_privProto, function meth(name, fn){
+    $L.set.meth(this.pub, name, fn);
   });
 
-  // > obj2.event(name)
+  // > obj.event(name)
   // Creates an event on an object. It automatically wires it up so that the
   // register function is obj.pub.on[name] and the fire event is obj.fire[name].
-  $L.Map.binder(_privProto, function event(name){
+  $L.set.binder(_privProto, function event(name){
     this.fire[name] = $L.Event.linkProperty(this.pub.on, name).fire;
   });
 
 
-  // > obj2.setMany(props)
+  // > obj.setMany(props)
     // Takes a key/value collection (generally a Map or a JavaScript object) and
     // sets those properties in the object.
     /* >
@@ -59,7 +59,7 @@ Lapiz.Module("Obj", ["Events"], function($L){
     */
     // After setMany is done, the change event will fire once and array of all
     // the keys that were changed will be passed in.
-  $L.Map.binder(_privProto, function setMany(props){
+  $L.set.binder(_privProto, function setMany(props){
     var property, i;
     var keys = Object.keys(props);
     var fireEnabled = this.fire.change.enabled;
@@ -74,51 +74,51 @@ Lapiz.Module("Obj", ["Events"], function($L){
     this.fire.change(this.pub, keys);
   });
 
-  // > obj2 = Lapiz.Obj(proto)
+  // > obj = Lapiz.Obj(proto)
   // Returns a Lapiz Object. The returned value is the private scope. The
   // prototype that is passed in will be attached to the public scope.
   // Generally, Obj should not be invoked directly, but through Cls.
-  $L.Map.meth($L, function Obj(proto){
+  $L.set.meth($L, function Obj(proto){
     var obj = Object.create(_privProto);
 
-    // > obj2.pub
+    // > obj.pub
     // The public scope of a Lapiz Object. All the properties will be exposed
     // here as well as any public methods.
     obj.attr = $L.Map();
 
-    // > obj2.attr  
+    // > obj.attr  
     // A map holding the private attribute scope of an object. This is where the
     // underlying values for properties are stored.
     obj.pub = Object.create(proto||null);
 
     _objPriv.set(obj.pub, obj);
 
-    // > obj2.fire
+    // > obj.fire
     // A map holding the fire controls for the object events.
     obj.fire = $L.Map();
 
-    // > obj2.pub.on
+    // > obj.pub.on
     // A map holding the register methods for object event listeners. 
     obj.pub.on = $L.Map();
 
-    // > obj2.pub.on.change
+    // > obj.pub.on.change
     // Fires when the object's properties change
 
-    // > obj2.fire.change
+    // > obj.fire.change
     // Fires the change event. It will automatically fire when properties
     // change.
     obj.fire['change'] = $L.Event.linkProperty(obj.pub.on, 'change').fire;
 
-    // > obj2.pub.on.delete
+    // > obj.pub.on.remove
     // Fires when an object is being deleted. If you are holding a collection of
     // objects, you should remove the object when this fires to prevent memory
     // leaks or holding onto objects that are considered dead.
 
-    // > obj2.fire.delete
+    // > obj.fire.remove
     // This should be called if you want to remove an object. It is build in,
     // but nothing is wired up to fire it automatically. It is your
     // responsibility to call it when you want the object deleted
-    obj.fire['delete'] = $L.Event.linkProperty(obj.pub.on, 'delete').fire;
+    obj.fire['remove'] = $L.Event.linkProperty(obj.pub.on, 'remove').fire;
     return obj;
   });
 
@@ -135,7 +135,7 @@ Lapiz.Module("Obj", ["Events"], function($L){
 
   // > classDef.properties(props, vals)
   // Defines properties on a class
-  $L.Map.binder(_clsDefProto, function properties(props){
+  $L.set.binder(_clsDefProto, function properties(props){
     var priv = _classBuilderWM.get(this);
     $L.each(props, function(val, key){
       priv.props[key] = val;
@@ -144,15 +144,26 @@ Lapiz.Module("Obj", ["Events"], function($L){
 
   // > classDef.constructor(constructor)
   // Defines the constructor for a class.
-  $L.Map.binder(_clsDefProto, function constructor(constructor){
+  $L.set.binder(_clsDefProto, function constructor(constructor){
     $L.typeCheck.func(constructor, "Constructor for class must be a function");
     _classBuilderWM.get(this).constructor = constructor;
   });
 
   // > classDef.meth(namedFn)
   // > classDef.meth(name, fn)
-  // Defines the constructor for a class
-  $L.Map.binder(_clsDefProto, function meth(name, fn){
+  // Defines a method on the class. Methods are late-bound:
+  /* >
+    var Person = Lapiz.Cls(function(cls){
+      cls.meth(function foo(){
+        return "FOO"+this.pub.name;
+      });
+    });
+
+    var adam = Person();
+    adam.name = "Adam";
+    adam.foo(); // returns "FOOAdam"
+  */
+  $L.set.binder(_clsDefProto, function meth(name, fn){
     if (fn === undefined){
       fn = name;
       name = fn.name;
@@ -166,17 +177,17 @@ Lapiz.Module("Obj", ["Events"], function($L){
     if (name[0] === "*" || name[0] === "+"){
       name = name.slice(1);
     }
-    $L.Map.prop(proto, name, {
+    $L.set.prop(proto, name, {
       get: function(){
         var priv = _objPriv.get(this);
-        $L.Map.setProperties(this, priv.attr, def, priv.fire.change);
+        $L.set.setProperties(this, priv.attr, def, priv.fire.change);
         return this[name];
       },
       set: function(val){
         var vals = $L.Map();
         vals[name] = val;
         var priv = _objPriv.get(this);
-        $L.Map.setProperties(this, priv.attr, def, vals, priv.fire.change);
+        $L.set.setProperties(this, priv.attr, def, vals, priv.fire.change);
       },
     });
   }
@@ -191,7 +202,7 @@ Lapiz.Module("Obj", ["Events"], function($L){
     $L.set(proto, name, function(){
       // in this scope 'this' will be the public scope of an object. This
       // function will only be invoked the first time it is called.
-      $L.Map.meth(this, name, fn, _objPriv.get(this));
+      $L.set.meth(this, name, fn, _objPriv.get(this));
       return this[name].apply(this, arguments);
     });
   }
@@ -202,7 +213,10 @@ Lapiz.Module("Obj", ["Events"], function($L){
   // Event registration, event will fire whenever a new Lapiz class is defined.
   $L.Event.linkProperty($L.on, "Cls", _newClassEvent);
 
-  $L.Map.meth($L, function Cls(classDef){
+  // > Lapiz.Cls( fn(classDef) )
+  // Used to define a Lapiz Class. The function passed in will receive a
+  // classDef object as both the 'this' object as well as the first argument.
+  $L.set.meth($L, function Cls(classDef){
     var pub = Object.create(_clsDefProto); //exposed in classDef call
     var priv = $L.Map();
     priv.props = $L.Map();

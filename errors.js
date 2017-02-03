@@ -6,15 +6,15 @@ Lapiz.Module("Errors", ["Events", "Collections"], function($L){
 
   // > Lapiz.on.error( errHandler(err) )
   // > Lapiz.on.error = errHandler(err)
-  // Register an error handler to listen for errors thrown with Lapiz.Err.throw
+  // Register an error handler to listen for errors thrown with Lapiz.Err.toss
   var _errEvent = $L.Event.linkProperty($L.on, "error");
 
-  // > Lapiz.Err.throw(Error)
-  // > Lapiz.Err.throw(errString)
+  // > Lapiz.Err.toss(Error)
+  // > Lapiz.Err.toss(errString)
   // Sends the event to any errHandlers, then throws the event. Note that the
   // error handlers cannot catch the error.
-  $L.set($L.Err, "throw", function(err){
-    if ($L.typeCheck.string(err)){
+  $L.set($L.Err, "toss", function(err){
+    if ($L.typeCheck.str(err)){
       err = new Error(err);
     }
     _errEvent.fire(err);
@@ -28,7 +28,7 @@ Lapiz.Module("Errors", ["Events", "Collections"], function($L){
 
   var _loggingEnabled = false;
   var _nullLogger = $L.Map();
-  $L.Map.meth(_nullLogger, function log(){});
+  $L.set.meth(_nullLogger, function log(){});
   Object.freeze(_nullLogger);
 
   // > Lapiz.Err.logTo = logger
@@ -36,7 +36,7 @@ Lapiz.Module("Errors", ["Events", "Collections"], function($L){
   // the console object:
   // > Lapiz.Err.logTo = console
   // But a custom logger can also be used.
-  $L.Map.setterGetter($L.Err, "logTo", _nullLogger, function(newVal, oldVal){
+  $L.set.setterGetter($L.Err, "logTo", _nullLogger, function(newVal, oldVal){
     if (newVal === null || newVal === undefined){
       newVal = _nullLogger;
       if (_loggingEnabled) {

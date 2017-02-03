@@ -1,4 +1,8 @@
 Lapiz.Module("Collections", function($L){
+  // > Lapiz.set
+  // Defined in init. This is used as a namespace for many helpers in setting
+  // properties.
+
   // > Lapiz.Map()
   // Returns a key value store that inherits no properties or methods. Useful to
   // bypass calling "hasOwnProperty". This is just a wrapper around
@@ -22,43 +26,43 @@ Lapiz.Module("Collections", function($L){
     return name;
   });
 
-  // > Lapiz.Map.meth(obj, namedFunc)
-  // > Lapiz.Map.meth(obj, name, function)
-  // > Lapiz.Map.meth(obj, namedFunc, bind)
-  // > Lapiz.Map.meth(obj, name, function, bind)
+  // > Lapiz.set.meth(obj, namedFunc)
+  // > Lapiz.set.meth(obj, name, function)
+  // > Lapiz.set.meth(obj, namedFunc, bind)
+  // > Lapiz.set.meth(obj, name, function, bind)
   // Attaches a method to an object. The method must be a named function.
   /* >
   var x = Lapiz.Map();
-  Lapiz.Map.meth(x, function foo(){...});
+  Lapiz.set.meth(x, function foo(){...});
   x.foo(); //calls foo
-  Lapiz.Map.meth(x, "bar", function(){...});
+  Lapiz.set.meth(x, "bar", function(){...});
   */
   // Providing a bind value will perminantly set the "this" value inside the
   // method.
   /* >
   var x = Lapiz.Map();
   x.name = "Test";
-  Lapiz.Map.meth(x, function foo(){
+  Lapiz.set.meth(x, function foo(){
     console.log(this.name);
   }, x);
   var y = Lapiz.Map();
   y.bar = x.foo;
   y.bar(); // calls x.foo with this set to x
   */
-  $L.set(Map, function meth(obj, name, fn, bind){
+  $L.set($L.set, function meth(obj, name, fn, bind){
     if (name === undefined && $L.typeCheck.func(obj)){
       // common special case: user forgot obj, attached named function
       // we can provide a very specific and helpful error
-      $L.Err['throw']("Meth called without object: "+obj.name);
+      $L.Err.toss("Meth called without object: "+obj.name);
     }
-    if ($L.typeCheck.func(fn) && $L.typeCheck.string(name)){
+    if ($L.typeCheck.func(fn) && $L.typeCheck.str(name)){
       $L.assert(name !== "", "Meth name cannot be empty string");
     } else if ($L.typeCheck.func(name) && name.name !== ""){
       bind = fn;
       fn = name;
       name = $L.getFnName(fn);
     } else {
-      Lapiz.Err['throw']("Meth requires either name and func or named function");
+      Lapiz.Err.toss("Meth requires either name and func or named function");
     }
     if (bind !== undefined){
       fn = fn.bind(bind);
@@ -66,20 +70,20 @@ Lapiz.Module("Collections", function($L){
     $L.set(obj, name, fn);
   });
 
-  // > Lapiz.Map.prop(obj, name, desc)
+  // > Lapiz.set.prop(obj, name, desc)
   // Just a wrapper around Object.defineProperty
-  Map.meth(Map, function prop(obj, name, desc){
+  $L.set.meth($L.set, function prop(obj, name, desc){
     Object.defineProperty(obj, name, desc);
   });
 
-  // > Lapiz.Map.setterMethod(obj, namedSetterFunc)
-  // > Lapiz.Map.setterMethod(obj, name, setterFunc)
-  // > Lapiz.Map.setterMethod(obj, namedSetterFunc, bind)
-  // > Lapiz.Map.setterMethod(obj, name, setterFunc, bind)
+  // > Lapiz.set.setterMethod(obj, namedSetterFunc)
+  // > Lapiz.set.setterMethod(obj, name, setterFunc)
+  // > Lapiz.set.setterMethod(obj, namedSetterFunc, bind)
+  // > Lapiz.set.setterMethod(obj, name, setterFunc, bind)
   // Attaches a setter method to an object. The method must be a named function.
   /* >
   var x = Lapiz.Map();
-  Lapiz.Map.meth(x, function foo(val){...});
+  Lapiz.set.meth(x, function foo(val){...});
 
   //these two calls are equivalent
   x.foo("bar");
@@ -87,23 +91,23 @@ Lapiz.Module("Collections", function($L){
   */
   // If an object is supplied for bind, the "this" value will always be the bind
   // object, this can be useful if the method will be passed as a value.
-  Map.meth(Map, function setterMethod(obj, name, fn, bind){
+  $L.set.meth($L.set, function setterMethod(obj, name, fn, bind){
     if (name === undefined && $L.typeCheck.func(obj)){
-      Lapiz.Err['throw']("SetterMethod called without object: "+obj.name);
+      Lapiz.Err.toss("SetterMethod called without object: "+obj.name);
     }
-    if ($L.typeCheck.func(fn) && $L.typeCheck.string(name)){
+    if ($L.typeCheck.func(fn) && $L.typeCheck.str(name)){
       $L.assert(name !=="", "SetterMethod name cannot be empty string");
     } else if ($L.typeCheck.func(name) && name.name !== ""){
       bind = fn;
       fn = name;
       name = fn.name;
     } else {
-      Lapiz.Err['throw']("SetterMethod requires either name and func or named function");
+      Lapiz.Err.toss("SetterMethod requires either name and func or named function");
     }
     if (bind !== undefined){
       fn = fn.bind(bind);
     }
-    Map.prop(obj, name, {
+    $L.set.prop(obj, name, {
       "get": function(){ return fn; },
       "set": fn
     });
@@ -111,19 +115,19 @@ Lapiz.Module("Collections", function($L){
 
   // > Lapiz.Map.has(obj, field)
   // Wrapper around Object.hasOwnProperty, useful for maps.
-  Map.meth(Map, function has(obj, field){
+  $L.set.meth(Map, function has(obj, field){
     return Object.hasOwnProperty.call(obj, field);
   });
 
-  // > Lapiz.Map.getter(object, namedGetterFunc() )
-  // > Lapiz.Map.getter(object, name, getterFunc() )
-  // > Lapiz.Map.getter(object, [namedGetterFuncs...] )
-  // > Lapiz.Map.getter(object, {name: getterFunc...} )
+  // > Lapiz.set.getter(object, namedGetterFunc() )
+  // > Lapiz.set.getter(object, name, getterFunc() )
+  // > Lapiz.set.getter(object, [namedGetterFuncs...] )
+  // > Lapiz.set.getter(object, {name: getterFunc...} )
   // Attaches a getter method to an object. The method must be a named function.
   /* >
   var x = Lapiz.Map();
   var ctr = 0;
-  Lapiz.Map.getter(x, function foo(){
+  Lapiz.set.getter(x, function foo(){
     var c = ctr;
     ctr +=1;
     return c;
@@ -131,33 +135,33 @@ Lapiz.Module("Collections", function($L){
   console.log(x.foo); //0
   console.log(x.foo); //1
   */
-  Map.meth(Map, function getter(obj, name, fn){
+  $L.set.meth($L.set, function getter(obj, name, fn){
     if (name === undefined && $L.typeCheck.func(obj)){
-      Lapiz.Err['throw']("Getter called without object: "+obj.name);
+      Lapiz.Err.toss("Getter called without object: "+obj.name);
     }
-    if ($L.typeCheck.func(fn) && $L.typeCheck.string(name)){
+    if ($L.typeCheck.func(fn) && $L.typeCheck.str(name)){
       $L.assert(name !=="", "Getter name cannot be empty string");
     } else if ($L.typeCheck.func(name) && name.name !== ""){
       fn = name;
       name = fn.name;
-    } else if ($L.typeCheck.array(name)){
+    } else if ($L.typeCheck.arr(name)){
       $L.each(name, function(getterFn){
-        Map.getter(obj, getterFn);
+        $L.set.getter(obj, getterFn);
       });
       return;
     } else if ($L.typeCheck.obj(name)){
       $L.each(name, function(getterFn, name){
-        Map.getter(obj, name, getterFn);
+        $L.set.getter(obj, name, getterFn);
       });
       return;
     } else {
-      Lapiz.Err['throw']("Getter requires either name and func or named function");
+      Lapiz.Err.toss("Getter requires either name and func or named function");
     }
-    Map.prop(obj, name, {"get": fn} );
+    $L.set.prop(obj, name, {"get": fn} );
   });
 
-  // > Lapiz.Map.setterGetter(obj, name, val, setterFunc, getterFunc)
-  // > Lapiz.Map.setterGetter(obj, name, val, setterFunc)
+  // > Lapiz.set.setterGetter(obj, name, val, setterFunc, getterFunc)
+  // > Lapiz.set.setterGetter(obj, name, val, setterFunc)
   // Creates a setter/getter property via a closure. A setter function is
   // required, if no getter is provided, the value will be returned. This is the
   // reason the method is named setterGetter rather than the more traditional
@@ -165,14 +169,14 @@ Lapiz.Module("Collections", function($L){
   // the first 4 are required and the last is optional.
   /* >
   var x = Lapiz.Map();
-  Lapiz.Map.setterGetter(x, "foo", 12, function(i){return parseInt(i);});
+  Lapiz.set.setterGetter(x, "foo", 12, function(i){return parseInt(i);});
   console.log(x.foo); // will log 12 as an int
   */
   // The value 'this' is always set to a special setterInterface for the setter
   // method. This can be used to cancel the set operation;
   /* >
   var x = Lapiz.Map();
-  Lapiz.Map.setterGetter(x, "foo", 0, function(i){
+  Lapiz.set.setterGetter(x, "foo", 0, function(i){
     i = parseInt(i);
     this.set = !isNaN(i);
     return i;
@@ -184,8 +188,8 @@ Lapiz.Module("Collections", function($L){
   console.log(x.foo); // value will still be 12
 
   */
-  Map.meth(Map, function setterGetter(obj, name, val, setter, getter){
-    if ($L.typeCheck.string(setter)){
+  $L.set.meth($L.set, function setterGetter(obj, name, val, setter, getter){
+    if ($L.typeCheck.str(setter)){
       setter = $L.parse(setter);
     }
     $L.typeCheck.func(setter, "Expected function or string reference to parser for setterGetter (argument 4)");
@@ -205,10 +209,10 @@ Lapiz.Module("Collections", function($L){
         val = newVal;
       }
     };
-    Map.prop(obj, name, desc);
+    $L.set.prop(obj, name, desc);
   });
 
-  // > Lapiz.Map.copyProps(copyTo, copyFrom, props...)
+  // > Lapiz.set.copyProps(copyTo, copyFrom, props...)
   // Copies the properties from the copyFrom object to the copyTo obj. The
   // properties should be strings. By default, the property will be copied with
   // basic assignment. If the property is preceeded by &, it will be copied by
@@ -216,13 +220,13 @@ Lapiz.Module("Collections", function($L){
   /* >
   var A = {"x": 12, "y": "foo", z:[]};
   var B = {};
-  Lapiz.Map.copyProps(B, A, "x", "&y");
+  Lapiz.set.copyProps(B, A, "x", "&y");
   A.x = 314;
   console.log(B.x); // 12
   B.y = "Test";
   console.log(A.y); // Test
   */
-  Map.meth(Map, function copyProps(copyTo, copyFrom){
+  $L.set.meth($L.set, function copyProps(copyTo, copyFrom){
     //todo: write tests for this
     var i = 2;
     var l = arguments.length;
@@ -249,34 +253,34 @@ Lapiz.Module("Collections", function($L){
     }
   });
 
-  // > Lapiz.Map.getterFactory(attr, property)
-  // > Lapiz.Map.getterFactory(attr, func)
+  // > Lapiz.set.getterFactory(attr, property)
+  // > Lapiz.set.getterFactory(attr, func)
   // Used in generating properties on an object or namespace.
-  Map.meth(Map, function getterFactory(attr, funcOrProp){
+  $L.set.meth($L.set, function getterFactory(attr, funcOrProp){
     if ($L.typeCheck.func(funcOrProp)) { return funcOrProp; }
-    if ($L.typeCheck.string(funcOrProp)) { return function(){ return attr[funcOrProp]; }; }
-    Lapiz.Err.throw("Getter value for property must be either a function or string");
+    if ($L.typeCheck.str(funcOrProp)) { return function(){ return attr[funcOrProp]; }; }
+    Lapiz.Err.toss("Getter value for property must be either a function or string");
   });
 
-  // > Lapiz.Map.setterFactory(self, attr, field, func)
-  // > Lapiz.Map.setterFactory(self, attr, field, func, callback)
+  // > Lapiz.set.setterFactory(self, attr, field, func)
+  // > Lapiz.set.setterFactory(self, attr, field, func, callback)
   // Used in generating setters for objects or namespaces. It will create the
   // setterInterface which provides special controls to setters and call the
   // setter with the interface as "this". If setterInterface.set is true,
   // the returned value will be set in attr[field]. If callback is defined,
   // self will be passed into callback
-  Map.meth(Map, function setterFactory(self, attr, field, func, callback){
-    if ($L.typeCheck.string(func)){
+  $L.set.meth($L.set, function setterFactory(self, attr, field, func, callback){
+    if ($L.typeCheck.str(func)){
       func = $L.parse(func);
     }
     return function(){
       //todo: add test for fireChange and event
-      // > lapizObject.properties:setterInterface
+      // > Lapiz.set.setProperties:setterInterface
       // The 'this' property of a setter will be the setter interface
       /* >
         var obj = $L.Map();
         var attr = $L.Map();
-        $L.Map.setProperties(obj, attr,{
+        $L.set.setProperties(obj, attr,{
           "*id": "int",
           "foo": function(val){
             // 'this' is not the setterInterface
@@ -297,17 +301,20 @@ Lapiz.Module("Collections", function($L){
         })
       */
       var setterInterface = {
-        // > lapizObject.properties:setterInterface.set
+        // > Lapiz.set.setProperties:setterInterface.set
         // Setting this to false will prevent the set and event fire
         set: true,
-        // > lapizObject.properties:fire
+        // > Lapiz.set.setProperties:fire
         // setting this to false will prevent the fire event, but the value
         // will still be set to the return value
         fire: true,
-        // > lapizObject.properties:setterInterface.event(obj.pub, val, oldVal)
+        // > Lapiz.set.setProperties:setterInterface.event(obj.pub, val, oldVal)
         // Attaching an event here will cause this event to be fired after the
         // set operation
         callback: undefined,
+        // > Lapiz.set.setProperties:setterInterface.self
+        // A reference to the object on which the setting was defined
+        self: self,
       };
       var val = func.apply(setterInterface, arguments);
       if (setterInterface.set) {
@@ -319,7 +326,7 @@ Lapiz.Module("Collections", function($L){
     };
   });
 
-  function _setReadOnly(){ $L.Err.throw("Cannot set readonly property"); };
+  function _setReadOnly(){ $L.Err.toss("Cannot set readonly property"); };
 
   function _setOnce(setter){
     var isSet = false;
@@ -332,16 +339,16 @@ Lapiz.Module("Collections", function($L){
     };
   }
 
-  // > Lapiz.Map.setProperties(obj, attr, properties, values, callback)
-  // > Lapiz.Map.setProperties(obj, attr, properties, values)
-  // > Lapiz.Map.setProperties(obj, attr, properties, callback)
-  // > Lapiz.Map.setProperties(obj, attr, properties)
+  // > Lapiz.set.setProperties(obj, attr, properties, values, callback)
+  // > Lapiz.set.setProperties(obj, attr, properties, values)
+  // > Lapiz.set.setProperties(obj, attr, properties, callback)
+  // > Lapiz.set.setProperties(obj, attr, properties)
   // Defines properties on an object and puts the underlying value in the
   // attributes collection. If callback is defined, it will be called whenever
   // any of the setters is invoked.
-  Map.meth(Map, function setProperties(obj, attr, properties, values, callback){
+  $L.set.meth($L.set, function setProperties(obj, attr, properties, values, callback){
     if (obj === undefined){
-      $L.Err.throw("Got undefined for obj in setProperties");
+      $L.Err.toss("Got undefined for obj in setProperties");
     }
     if (callback === undefined && $L.typeCheck.func(values)){
       callback = values;
@@ -357,7 +364,7 @@ Lapiz.Module("Collections", function($L){
       if (property[0] === "+"){
         property = property.slice(1);
         if (val === undefined || val === null){
-          desc.get = Map.getterFactory(attr, property);
+          desc.get = $L.set.getterFactory(attr, property);
         } else if ($L.typeCheck.func(val)){
           desc.get = val;
         }
@@ -376,17 +383,17 @@ Lapiz.Module("Collections", function($L){
         }
 
         if (val === undefined || val === null){
-          $L.Err.throw("Invalid value for '" + property + "'");
-        } else if ($L.typeCheck.func(val) || $L.typeCheck.string(val)){
-          desc.set = Map.setterFactory(obj, attr, property, val, callback);
-          desc.get = Map.getterFactory(attr, property);
+          $L.Err.toss("Invalid value for '" + property + "'");
+        } else if ($L.typeCheck.func(val) || $L.typeCheck.str(val)){
+          desc.set = $L.set.setterFactory(obj, attr, property, val, callback);
+          desc.get = $L.set.getterFactory(attr, property);
         } else if (val.set !== undefined || val.get !== undefined) {
           if (val.set !== undefined){
-            desc.set = Map.setterFactory(obj, attr, property, val.set, callback);
+            desc.set = $L.set.setterFactory(obj, attr, property, val.set, callback);
           }
-          desc.get = (val.get !== undefined) ? Map.getterFactory(attr, val.get) : Map.getterFactory(attr, property);
+          desc.get = (val.get !== undefined) ? $L.set.getterFactory(attr, val.get) : $L.set.getterFactory(attr, property);
         } else {
-          $L.Err.throw("Could not construct getter/setter for " + property);
+          $L.Err.toss("Could not construct getter/setter for " + property);
         }
 
         // If this is a getter, we grab the setter before removing it. This allows
@@ -403,8 +410,8 @@ Lapiz.Module("Collections", function($L){
     }
   });
 
-  // > Lapiz.Map.binder(proto, namedFn)
-  // > Lapiz.Map.binder(proto, name, fn)
+  // > Lapiz.set.binder(proto, namedFn)
+  // > Lapiz.set.binder(proto, name, fn)
   // Handles late binding for prototype methods
   /* >
   var fooProto = {};
@@ -422,22 +429,22 @@ Lapiz.Module("Collections", function($L){
   // without leveraging prototypes, we can create a lot of uncessary functions.
   // With late binding, 'this' will always refer to the original 'this' context,
   // but bound functions will only be generated when they are called or assigned
-  Map.meth(Map, function binder(proto, name, fn){
+  $L.set.meth($L.set, function binder(proto, name, fn){
     if (fn === undefined){
       fn = name;
       name = fn.name;
     }
     $L.typeCheck.func(fn, "Expected fn for binder");
-    if (!$L.typeCheck.string(name) && name !== ""){
-      $L.Err.throw("Invalid name for binder function");
+    if (!$L.typeCheck.str(name) && name !== ""){
+      $L.Err.toss("Invalid name for binder function");
     }
     Object.defineProperty(proto, name, {
       get: function(){
         var bfn = fn.bind(this);
-        $L.Map.meth(this, name, bfn);
+        $L.set.meth(this, name, bfn);
         return bfn;
       },
-      set: function(){ $L.Err.throw("Cannot reassign method "+name); },
+      set: function(){ $L.Err.toss("Cannot reassign method "+name); },
     });
   });
 
@@ -456,38 +463,38 @@ Lapiz.Module("Collections", function($L){
   var _nsProto = Map();
 
   // > namespace.properties(props, vals)
-  Map.binder(_nsProto, function properties(props, vals){
-    Map.setProperties(this.namespace, this.attr, props, vals);
+  $L.set.binder(_nsProto, function properties(props, vals){
+    $L.set.setProperties(this.namespace, this.attr, props, vals);
   });
 
   // > namespace.meth(namedFn)
   // > namespace.meth(name, fn)
-  Map.binder(_nsProto, function meth(name, fn){
+  $L.set.binder(_nsProto, function meth(name, fn){
     if (fn === undefined){
-      $L.Map.meth(this.namespace, name, this);
+      $L.set.meth(this.namespace, name, this);
     } else {  
-      $L.Map.meth(this.namespace, name, fn, this);
+      $L.set.meth(this.namespace, name, fn, this);
     }
   });
 
   // > namespace.set(name, val)
   // Sets the value as a property on the namespace.
-  Map.binder(_nsProto, function set(name, val){
+  $L.set.binder(_nsProto, function set(name, val){
     Object.defineProperty(this.namespace, name, {'value': val});
   });
 
   // > namespace.setterMethod(namedFn)
   // > namespace.setterMethod(name, fn)
-  Map.binder(_nsProto, function setterMethod(name, fn){
+  $L.set.binder(_nsProto, function setterMethod(name, fn){
     if (fn === undefined){
-      $L.Map.setterMethod(this.namespace, name, this);
+      $L.set.setterMethod(this.namespace, name, this);
     } else {  
-      $L.Map.setterMethod(this.namespace, name, fn, this);
+      $L.set.setterMethod(this.namespace, name, fn, this);
     }
   });
 
-  // > Lapiz.Namespace()
-  // > Lapiz.Namespace(constructor)
+  // > namespace = Lapiz.Namespace()
+  // > namespace = Lapiz.Namespace(constructor)
   // Returns a namespace. If a constructor is given, the inner namespace is
   // returned, otherwise the namespace wrapper is returned.
   $L.set($L, function Namespace(fn){
@@ -520,7 +527,7 @@ Lapiz.Module("Collections", function($L){
   Lapiz.remove(arr,1);
   console.log(arr); //[3,4,1,5,9]
   */
-  Map.meth($L, function remove(arr, el, start){
+  $L.set.meth($L, function remove(arr, el, start){
     var i = arr.indexOf(el, start);
     if (i > -1) { arr.splice(i, 1); }
   });
@@ -546,9 +553,9 @@ Lapiz.Module("Collections", function($L){
     console.log(key, val);
   });
   */
-  Map.meth($L, function each(obj, fn){
+  $L.set.meth($L, function each(obj, fn){
     var i;
-    if ($L.typeCheck.array(obj)){
+    if ($L.typeCheck.arr(obj)){
       var l = obj.length;
       for(i=0; i<l; i+=1){
         if (fn(obj[i], i)) {return i;}
@@ -569,7 +576,7 @@ Lapiz.Module("Collections", function($L){
   // results can be unpredictable. This primarily provided as a tool for
   // interfacing with other libraries and frameworks. Use the accessor interface
   // whenever possible.
-  Map.meth($L, function ArrayConverter(accessor){
+  $L.set.meth($L, function ArrayConverter(accessor){
     var arr = [];
     var index = [];
     accessor.each(function(obj, key){
@@ -597,6 +604,7 @@ Lapiz.Module("Collections", function($L){
   });
 
   // > Lapiz.argMap()
+  // > Lapiz.argMap(levels)
   // This is one of the few "magic methods" in Lapiz. When called from within a
   // function, it returns the arguments names and values as a map.
   /* >
@@ -606,17 +614,27 @@ Lapiz.Module("Collections", function($L){
   }
   foo('do','re','mi'); // logs {'x':'do', 'y':'re', 'z':'mi'}
   */
-  $L.Map.meth($L, function argMap(){
-    var args = arguments.callee.caller.arguments;
-    var argNames = (arguments.callee.caller + "").match(/\([^)]*\)/g);
-    var dict = $L.Map();
+  // Levels determines how many levels up the stack to go.
+  $L.set.meth($L, function argMap(levels){
+    levels = levels || 0;
+    var caller = arguments.callee.caller;
+    var map = $L.Map();
+    while (levels > 0){
+      levels--;
+      caller = caller.caller;
+      if (caller === undefined){
+        return map; 
+      }
+    }
+    var args = caller.arguments;
+    var argNames = (caller + "").match(/\([^)]*\)/g);
     var i,l;
     argNames = argNames[0].match(/[\w$]+/g);
     l = argNames.length;
     for(i=0; i<l; i+=1){
-      dict[argNames[i]] = args[i];
+      map[argNames[i]] = args[i];
     }
-    return dict;
+    return map;
   });
 
 });

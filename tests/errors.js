@@ -1,7 +1,7 @@
 Lapiz.Test("Errors/Throw", ["Event/"], function(t){
   var errMsg = false;
   try {
-    Lapiz.Err.throw(new Error("Testing Errors"));
+    Lapiz.Err.toss(new Error("Testing Errors"));
   } catch(err){
     errMsg = err.message;
   }
@@ -22,7 +22,7 @@ Lapiz.Test("Errors/LogTo", ["Errors/Throw"], function(t){
   Lapiz.Err.logTo === testConsole || t.error("Logging should be set to testConsole");
 
   try{
-    Lapiz.Err.throw("Testing Errors");
+    Lapiz.Err.toss("Testing Errors");
   } catch(err){
   }
 

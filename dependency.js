@@ -5,7 +5,7 @@ Lapiz.Module("Dependency", function($L){
   // Returns the dependency associated with name
   $L.Dependency = function(name){
     var d = _dependencies[name];
-    if (d === undefined) { Lapiz.Err.throw("Cannot find Dependency " + name); }
+    if (d === undefined) { Lapiz.Err.toss("Cannot find Dependency " + name); }
     return d();
   };
 

@@ -23,7 +23,7 @@ Lapiz.Module("Filter", function($L){
     // if filterOrField is a string, and val is set, create a function
     // to check that field against the val
     var filterFn = filterOrField;
-    if ($L.typeCheck.string(filterOrField) && val !== undefined){
+    if ($L.typeCheck.str(filterOrField) && val !== undefined){
       filterFn = function(key, accessor){
         return accessor(key)[filterOrField] === val;
       };
@@ -42,32 +42,32 @@ Lapiz.Module("Filter", function($L){
     // > filter.Sort(sorterFunction)
     // > filter.Sort(fieldName)
     // Returns a Sorter
-    $L.Map.meth(self, function Sort(funcOrField){ return $L.Sort(self, funcOrField); });
+    $L.set.meth(self, function Sort(funcOrField){ return $L.Sort(self, funcOrField); });
 
     // > filter.Filter(filterFunction)
     // > filter.Filter(field, val)
     // Returns a filter.
-    $L.Map.meth(self, function Filter(filterOrField, val){ return $L.Filter(self, filterOrField, val); });
+    $L.set.meth(self, function Filter(filterOrField, val){ return $L.Filter(self, filterOrField, val); });
 
     // > filter.has(key)
     // Returns a bool indicating if the filter contains the key
-    $L.Map.meth(self, function has(key){
+    $L.set.meth(self, function has(key){
       return _index.indexOf(key.toString()) > -1;
     });
 
     // > filter.keys
     // Returns an array of keys
-    $L.Map.getter(self, function keys(){
+    $L.set.getter(self, function keys(){
       return _index.slice(0);
     });
 
     // > filter.length
     // Read-only property that returns the length
-    $L.Map.getter(self, function length(){
+    $L.set.getter(self, function length(){
       return _index.length;
     });
 
-    $L.Map.meth(self, function each(fn){
+    $L.set.meth(self, function each(fn){
       var i;
       var l = _index.length;
       for(i=0; i<l; i+=1){
@@ -141,7 +141,7 @@ Lapiz.Module("Filter", function($L){
 
     // > filter.ForceRescan()
     // Rescans all values from parent access and fires insert and remove events
-    $L.Map.meth(self, function ForceRescan(){
+    $L.set.meth(self, function ForceRescan(){
       accessor.each(function(val, key){
         key = key.toString();
         var willBeInSet = filterFn(key, accessor);
@@ -162,7 +162,7 @@ Lapiz.Module("Filter", function($L){
     // Changes the function used for the filter. The insert and remove events
     // will fire as the members are scanned to check if they comply with the
     // new members
-    $L.Map.setterMethod(self, function func(fn){
+    $L.set.setterMethod(self, function func(fn){
       if ($L.typeCheck.nested(filterFn, "on", "change", "deregister", "func")){
         filterFn.on.change.deregister(self.ForceRescan);
       }
@@ -184,7 +184,7 @@ Lapiz.Module("Filter", function($L){
     // After calling kill, a Filter is no longer live. It will not receive
     // updates and can more easily be garbage collected (because it's
     // parent accessor no longer has any references to it).
-    $L.Map.meth(self, function kill(){
+    $L.set.meth(self, function kill(){
       accessor.on.insert.deregister(inFn);
       accessor.on.remove.deregister(remFn);
       accessor.on.change.deregister(changeFn);

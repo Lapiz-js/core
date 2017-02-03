@@ -202,7 +202,7 @@ as well as withing the Lapiz sorter module
       b = acc(b);
       return (a.name > b.name ? 1 : (b.name > a.name ? -1 : 0));
     }
-    Lapiz.Map.meth(sortFn, function range(key, name, acc){
+    Lapiz.set.meth(sortFn, function range(key, name, acc){
       var obj = acc(key);
       return (obj.name > name ? 1 : (name > obj.name ? -1 : 0)); 
     });

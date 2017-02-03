@@ -49,7 +49,7 @@ Lapiz.Module("Dictionary", function($L){
         try {
           return _dict[key];
         } catch (err){
-          Lapiz.Err.throw(err);
+          Lapiz.Err.toss(err);
         }
       }
 
@@ -124,7 +124,7 @@ Lapiz.Module("Dictionary", function($L){
     });
     console.log(fruitDict.length); // 3
     */
-    $L.Map.getter(self, function length(){
+    $L.set.getter(self, function length(){
       return _length;
     });
 
@@ -199,7 +199,7 @@ Lapiz.Module("Dictionary", function($L){
     });
     console.log(fruitDict.keys); // ["C", "A", "B"] in some order
     */
-    $L.Map.getter(self, function keys(){
+    $L.set.getter(self, function keys(){
       return Object.keys(_dict);
     });
 
@@ -228,7 +228,7 @@ Lapiz.Module("Dictionary", function($L){
     self.Accessor = function(key){
       return _dict[key];
     };
-    $L.Map.copyProps(self.Accessor, self, "Accessor", "&length", "has", "each", "on", "Sort", "Filter", "&keys");
+    $L.set.copyProps(self.Accessor, self, "Accessor", "&length", "has", "each", "on", "Sort", "Filter", "&keys");
     self.Accessor._cls = $L.Accessor;
 
     Object.freeze(self.Accessor);

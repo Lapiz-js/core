@@ -68,7 +68,7 @@ Lapiz.Test("Obj/Cls", function(t){
 
 Lapiz.Test("Obj/Obj", function(t){
   var proto = Lapiz.Map();
-  Lapiz.Map.meth(proto, function sayHi(){
+  Lapiz.set.meth(proto, function sayHi(){
     return "Hi, "+this.name;
   });
   var obj = Lapiz.Obj(proto).pub;
@@ -103,34 +103,10 @@ Lapiz.Test("Obj/Change", function(t){
   changeFired        || t.error('Change event did not fire');
 });
 
-Lapiz.Test("Obj/Index", function(t){
-  var Person = Lapiz.Cls(function(cls){
-    // note that this === cls
-    cls.properties({
-      "*id":  "int",
-      "name": "string",
-      "role": "string",
-      "active": "bool"
-    });
-
-    cls.constructor(function(id, name, role, active){
-      this.setMany(Lapiz.argMap());
-    });
-
-  });
-
-  Lapiz.Index(Person);
-
-  Person(6, "Adam", "admin", true);
-
-  var person = Person.get(6);
-  person.name === "Adam"  || t.error("Expected 'Adam', got " + person.name);
-});
-
 (function(){
   var _Person = function(cls){
     cls.properties({
-      "id": "int",
+      "*id": "int",
       "name": "string",
       "role": "string",
       "active": "bool",
@@ -138,9 +114,21 @@ Lapiz.Test("Obj/Index", function(t){
 
     cls.constructor(function(id, name, role, active){
       this.setMany(Lapiz.argMap());
-      return this;
     });
+
+    cls.meth(function setMany(props){this.setMany(props);});
   };
+
+  Lapiz.Test("Obj/Index", function(t){
+    var Person = Lapiz.Cls(_Person);
+
+    Lapiz.Index(Person);
+
+    Person(6, "Adam", "admin", true);
+
+    var person = Person.get(6);
+    person.name === "Adam"  || t.error("Expected 'Adam', got " + person.name);
+  });
 
   Lapiz.Test("Obj/SetMany", ["Event/", "CollectionsHelper/ArgMap"], function(t){
     var Person = Lapiz.Cls(_Person);
@@ -153,7 +141,6 @@ Lapiz.Test("Obj/Index", function(t){
       "role": "editor",
       "active": true
     });
-    person = person.pub;
 
     person.name === "Lauren" || t.error("Name was not set correctly");
     person.role === "editor" || t.error("Role was not set correctly");
@@ -167,7 +154,7 @@ Lapiz.Test("Obj/Index", function(t){
     var person = Person(6, "Adam", "admin", false);
     var changeCounter = 0;
 
-    person.pub.on.change(function(person){
+    person.on.change(function(person){
       name = person.name;
       role = person.role;
       active = person.active;
@@ -189,7 +176,7 @@ Lapiz.Test("Obj/Index", function(t){
   Lapiz.Test("Obj/ChangeOnSet", ["Event/"], function(t){
     var Person = Lapiz.Cls(_Person);
 
-    var person = Person(6, "Adam", "admin", false).pub;
+    var person = Person(6, "Adam", "admin", false);
     var name = person.name;
     var role = person.role;
     var active = person.active;
@@ -241,7 +228,7 @@ Lapiz.Test("Obj/Index", function(t){
       });
     });
 
-    var adam = Person(6, "Adam", "admin", false).pub;
+    var adam = Person(6, "Adam", "admin", false);
     adam.foo === "Foo: 6" || t.error("Bad response from getter");
     Lapiz.Err.logTo = lg;
   });

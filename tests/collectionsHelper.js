@@ -96,8 +96,8 @@ Lapiz.Test("CollectionsHelper/Method", function(t){
   function foo(val){
     flag = val;
   }
-  Lapiz.Map.meth(obj, foo);
-  Lapiz.Map.meth(obj, "bar", foo);
+  Lapiz.set.meth(obj, foo);
+  Lapiz.set.meth(obj, "bar", foo);
 
   obj.foo("pass A");
   flag === "pass A" || t.error("Expected 'pass A'");
@@ -109,7 +109,7 @@ Lapiz.Test("CollectionsHelper/Method", function(t){
 Lapiz.Test("CollectionsHelper/SetterMethod", function(t){
   var obj = {};
   var flag = "failed";
-  Lapiz.Map.setterMethod(obj, function foo(val){
+  Lapiz.set.setterMethod(obj, function foo(val){
     flag = val;
   });
 
@@ -124,7 +124,7 @@ Lapiz.Test("CollectionsHelper/BindSetterMethod", function(t){
   var obj = {
     flag: "failed"
   };
-  Lapiz.Map.setterMethod(obj, function foo(val){
+  Lapiz.set.setterMethod(obj, function foo(val){
     this.flag = val;
   }, obj);
 
@@ -139,7 +139,7 @@ Lapiz.Test("CollectionsHelper/BindSetterMethod", function(t){
 Lapiz.Test("CollectionsHelper/Getter/NamedFunc", function(t){
   var obj = {};
   var ctr = 0;
-  Lapiz.Map.getter(obj, function foo(){
+  Lapiz.set.getter(obj, function foo(){
     var c = ctr;
     ctr +=1;
     return c;
@@ -153,7 +153,7 @@ Lapiz.Test("CollectionsHelper/Getter/NamedFunc", function(t){
 Lapiz.Test("CollectionsHelper/Getter/NamedStr", function(t){
   var obj = {};
   var ctr = 0;
-  Lapiz.Map.getter(obj, "foo", function(){
+  Lapiz.set.getter(obj, "foo", function(){
     var c = ctr;
     ctr +=1;
     return c;
@@ -167,7 +167,7 @@ Lapiz.Test("CollectionsHelper/Getter/NamedStr", function(t){
 Lapiz.Test("CollectionsHelper/Getter/Array", function(t){
   var obj = {};
   var ctr = 0;
-  Lapiz.Map.getter(obj, [
+  Lapiz.set.getter(obj, [
     function foo(){
       var c = ctr;
       ctr +=1;
@@ -187,7 +187,7 @@ Lapiz.Test("CollectionsHelper/Getter/Array", function(t){
 Lapiz.Test("CollectionsHelper/Getter/Object", function(t){
   var obj = {};
   var ctr = 0;
-  Lapiz.Map.getter(obj, {
+  Lapiz.set.getter(obj, {
     "foo": function(){
       var c = ctr;
       ctr +=1;
@@ -206,8 +206,8 @@ Lapiz.Test("CollectionsHelper/Getter/Object", function(t){
 
 Lapiz.Test("CollectionsHelper/SetterGetter", function(t){
   var obj = {};
-  Lapiz.Map.setterGetter(obj, "foo", 12, function(i){return parseInt(i);});
-  Lapiz.Map.setterGetter(obj, "money", 5.67333, "number", function(val){
+  Lapiz.set.setterGetter(obj, "foo", 12, function(i){return parseInt(i);});
+  Lapiz.set.setterGetter(obj, "money", 5.67333, "number", function(val){
     return "$" + (val.toFixed(2));
   });
 
@@ -227,7 +227,7 @@ Lapiz.Test("CollectionsHelper/CopyPropVal", function(t){
     "B": "banana",
     "C": "cantaloupe",
   };
-  Lapiz.Map.copyProps(objTo, objFrom, "A", "C");
+  Lapiz.set.copyProps(objTo, objFrom, "A", "C");
 
   objTo.A === "apple"      || t.error("Expected 'apple'");
   objTo.C === "cantaloupe" || t.error("Expected 'cantaloupe'");
@@ -240,7 +240,7 @@ Lapiz.Test("CollectionsHelper/CopyPropRef", function(t){
     "B": "banana",
     "C": "cantaloupe",
   };
-  Lapiz.Map.copyProps(objTo, objFrom, "&A", "&C");
+  Lapiz.set.copyProps(objTo, objFrom, "&A", "&C");
 
   objTo.A === "apple"      || t.error("Expected 'apple', got "+objTo.A);
   objTo.C === "cantaloupe" || t.error("Expected 'cantaloupe'");
@@ -259,17 +259,17 @@ Lapiz.Test("CollectionsHelper/BadConstructorsTest", function(t){
     }
   }
 
-  errMsg(function(){Lapiz.Map.meth(function foo(){});}) === "Meth called without object: foo" || t.error("Expected meth error");
-  errMsg(function(){Lapiz.Map.meth({}, function(){});}) === "Meth requires either name and func or named function" || t.error("Expected meth error");
-  errMsg(function(){Lapiz.Map.setterMethod(function foo(){});}) === "SetterMethod called without object: foo" || t.error("Expected setterMethod error");
-  errMsg(function(){Lapiz.Map.setterMethod({}, "", function(){});}) === "SetterMethod name cannot be empty string" || t.error("Expected setterMethod error");
-  errMsg(function(){Lapiz.Map.getter(function foo(){});}) === "Getter called without object: foo" || t.error("Expected getter error");
-  errMsg(function(){Lapiz.Map.getter({}, "", function(){});}) === "Getter name cannot be empty string" || t.error("Expected setterMethod error");
-  errMsg(function(){Lapiz.Map.setProperties();}) === "Got undefined for obj in setProperties" || t.error("Expected setProperties error");
+  errMsg(function(){Lapiz.set.meth(function foo(){});}) === "Meth called without object: foo" || t.error("Expected meth error");
+  errMsg(function(){Lapiz.set.meth({}, function(){});}) === "Meth requires either name and func or named function" || t.error("Expected meth error");
+  errMsg(function(){Lapiz.set.setterMethod(function foo(){});}) === "SetterMethod called without object: foo" || t.error("Expected setterMethod error");
+  errMsg(function(){Lapiz.set.setterMethod({}, "", function(){});}) === "SetterMethod name cannot be empty string" || t.error("Expected setterMethod error");
+  errMsg(function(){Lapiz.set.getter(function foo(){});}) === "Getter called without object: foo" || t.error("Expected getter error");
+  errMsg(function(){Lapiz.set.getter({}, "", function(){});}) === "Getter name cannot be empty string" || t.error("Expected setterMethod error");
+  errMsg(function(){Lapiz.set.setProperties();}) === "Got undefined for obj in setProperties" || t.error("Expected setProperties error");
   
   var em = errMsg(function(){
     var p = {};
-    Lapiz.Map.binder(p, function foo(){});
+    Lapiz.set.binder(p, function foo(){});
     p.foo = "test";
   })
   em === "Cannot reassign method foo" || t.error("Expected binder error");
@@ -280,7 +280,7 @@ Lapiz.Test("CollectionsHelper/SetProperties", function(t){
   var attr = Lapiz.Map();
   var change = Lapiz.Event();
   var setterEvt = Lapiz.Event();
-  Lapiz.Map.setProperties(obj, attr, {
+  Lapiz.set.setProperties(obj, attr, {
     "*id": "int",
     "name": "string", 
     "foo": function(val){
@@ -334,7 +334,7 @@ Lapiz.Test("CollectionsHelper/SetterFactory", function(t){
     return Lapiz.parse.int(val);
   }
 
-  self.foo = Lapiz.Map.setterFactory(self, attr, "foo", setter, callback1)
+  self.foo = Lapiz.set.setterFactory(self, attr, "foo", setter, callback1)
   self.foo("22");
 
   attr.foo === 22    || t.error("Expected 22");
@@ -428,6 +428,19 @@ Lapiz.Test("CollectionsHelper/ArgMap", function(t){
   var coord = function(x,y){
     return Lapiz.argMap();
   }(3,4);
+
+  coord['x'] === 3 || t.error("expected 3");
+  coord['y'] === 4 || t.error("expected 4");
+});
+
+Lapiz.Test("CollectionsHelper/ArgMapLevels", function(t){
+  var coord = function(x,y){
+    return function(){
+      return Lapiz.argMap(1);
+    }();
+  }(3,4);
+
+  console.log(coord);
 
   coord['x'] === 3 || t.error("expected 3");
   coord['y'] === 4 || t.error("expected 4");

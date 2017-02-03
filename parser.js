@@ -1,6 +1,6 @@
 Lapiz.Module("Parser", function($L){
   function resolveParser(parser){
-    if ($L.typeCheck.string(parser) && $L.parse[parser] !== undefined){
+    if ($L.typeCheck.str(parser) && $L.parse[parser] !== undefined){
       return $L.parse[parser];
     }
     return parser;
@@ -13,14 +13,14 @@ Lapiz.Module("Parser", function($L){
   // > Lapiz.parse("array|int")
   // or
   // > Lapiz.parse("array|int")
-  $L.Map.meth($L, function parse(){
+  $L.set.meth($L, function parse(){
     var parser;
     var args = Array.prototype.slice.call(arguments, 0);
     $L.assert(args.length > 0, "Lapiz.parse requires at least one arg");
     var parseStrs = args.shift();
     if (Lapiz.typeCheck.func(parseStrs)){
       parser = parseStrs;
-    } else if ($L.typeCheck.string(parseStrs)){
+    } else if ($L.typeCheck.str(parseStrs)){
       // something like "int" or "array|int"
       // so we work backwards
       parseStrs = parseStrs.split("|");
@@ -33,7 +33,7 @@ Lapiz.Module("Parser", function($L){
         parser = Lapiz.parse[parserName].call(this, parser);
       }
     } else {
-      Lapiz.Err.throw("Lapiz.parse requires first arg as either string or function");
+      Lapiz.Err.toss("Lapiz.parse requires first arg as either string or function");
     }
 
     if (args.length>0){
@@ -47,7 +47,7 @@ Lapiz.Module("Parser", function($L){
   // around parseInt, however if val is a boolean it will reurn eitehr 1
   // or 0.
   $L.set($L.parse, "int", function(val){
-    //can't use $L.Map.meth because "int" is reserve word
+    //can't use $L.set.meth because "int" is reserve word
     if (val === true){
       return 1;
     } else if (val === false){
@@ -63,7 +63,7 @@ Lapiz.Module("Parser", function($L){
   // that will be used, if it doesn't have .str but it does have
   // .toString, that will be used. As a last resort it will be
   // concatted with an empty string.
-  $L.Map.meth($L.parse, function string(val){
+  $L.set.meth($L.parse, function string(val){
     if (val === undefined || val === null) { return ""; }
     var type = typeof(val);
     if (type === "string") { return val; }
@@ -88,8 +88,8 @@ Lapiz.Module("Parser", function($L){
   // > Lapiz.parse.bool(val)
   // Converts val to a bool. Takes into account a few special edge cases, "O"
   // and "false" (any case) are cast to false.
-  $L.Map.meth($L.parse, function bool(val){
-    if ($L.typeCheck.string(val) && (val === "0" || val.toLowerCase() === "false")){
+  $L.set.meth($L.parse, function bool(val){
+    if ($L.typeCheck.str(val) && (val === "0" || val.toLowerCase() === "false")){
       return false;
     }
     return !!val;
@@ -97,18 +97,18 @@ Lapiz.Module("Parser", function($L){
 
   // > Lapiz.parse.strictBool(val)
   // Converts val to a bool
-  $L.Map.meth($L.parse, function strictBool(val){
+  $L.set.meth($L.parse, function strictBool(val){
     return !!val;
   });
 
   // > Lapiz.parse.number(val)
   // Converts val to a number. This is a wrapper around parseFloat.
-  $L.Map.meth($L.parse, function number(val){ return parseFloat(val); });
+  $L.set.meth($L.parse, function number(val){ return parseFloat(val); });
 
   // Lapiz.parse.object(val)
   // This is just a pass through function, not a true parser. It can
   // be useful for object properties.
-  $L.Map.meth($L.parse, function object(obj){ return obj; });
+  $L.set.meth($L.parse, function object(obj){ return obj; });
 
   // > Lapiz.parse.array(parser)
   // This takes a parser or a string (which will be resolved agains Lapiz.parse)
@@ -118,7 +118,7 @@ Lapiz.Module("Parser", function($L){
   console.log(arrIntParser([3.14, "12.34", true]); // [3, 12, 1]
   console.log(arrIntParser("22.22"); // [22]
   */
-  $L.Map.meth($L.parse, function array(parser){
+  $L.set.meth($L.parse, function array(parser){
     parser = resolveParser(parser);
     return function(arr){
       if (Array.isArray(arr)){

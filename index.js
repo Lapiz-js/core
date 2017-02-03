@@ -3,7 +3,7 @@ Lapiz.Module("Index", function($L){
   // > Lapiz.Index(lapizClass, primaryFunc)
   // > Lapiz.Index(lapizClass, primaryField)
   // > Lapiz.Index(lapizClass, primary, domain)
-  // Adds an index to a class. If class.on.change and class.on.delete exist,
+  // Adds an index to a class. If class.on.change and class.on.remove exist,
   // the index will use these to keep itself up to date.
   //
   // Index needs a primary key. Any to entries with the same primary key are
@@ -18,18 +18,18 @@ Lapiz.Module("Index", function($L){
   //
   // The class does not have to be a lapizClass, but it must have a similar
   // interface. Specifically, it must have cls.on.change and the instances of
-  // the class must have obj.on.change and obj.on.delete.
+  // the class must have obj.on.change and obj.on.remove.
   $L.set($L, "Index", function(cls, primaryFunc, domain){
     if (primaryFunc === undefined){
       primaryFunc = function(obj){return obj[$L.Index.defaultPrimary];};
-    } else if ($L.typeCheck.string(primaryFunc)){
+    } else if ($L.typeCheck.str(primaryFunc)){
       primaryFunc = function(field){
         return function(obj){
           return obj[field];
         };
       }(primaryFunc);
     } else if ( !$L.typeCheck.func(primaryFunc) ){
-      Lapiz.Err.throw("Expected a function or string");
+      Lapiz.Err.toss("Expected a function or string");
     }
 
     if (domain === undefined) {
@@ -74,7 +74,7 @@ Lapiz.Module("Index", function($L){
 
     cls.on.create(function(obj){
       obj.on.change(_upsert);
-      obj.on["delete"](function(obj){
+      obj.on.remove(function(obj){
         if ($L.typeCheck.nested(obj, "on", "change", "deregister", "func")){
           obj.on.change.deregister(_upsert);
         }
@@ -106,7 +106,7 @@ Lapiz.Module("Index", function($L){
 
   // > Lapiz.Index.Class(constructor, primaryFunc, domain)
   // Shorthand helper, constructor for an indexed class.
-  $L.Map.meth($L.Index, function Cls(constructor, primaryFunc, domain){
+  $L.set.meth($L.Index, function Cls(constructor, primaryFunc, domain){
     return Lapiz.Index(Lapiz.Cls(constructor), primaryFunc, domain);
   });
 
