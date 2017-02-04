@@ -266,6 +266,7 @@ Lapiz.Test("CollectionsHelper/BadConstructorsTest", function(t){
   errMsg(function(){Lapiz.set.getter(function foo(){});}) === "Getter called without object: foo" || t.error("Expected getter error");
   errMsg(function(){Lapiz.set.getter({}, "", function(){});}) === "Getter name cannot be empty string" || t.error("Expected setterMethod error");
   errMsg(function(){Lapiz.set.setProperties();}) === "Got undefined for obj in setProperties" || t.error("Expected setProperties error");
+  errMsg(function(){Lapiz.set.binder({},function(){});}) === "Invalid name for binder function" || t.error("Expected 'Invalid name for binder function' error");
   
   var em = errMsg(function(){
     var p = {};
@@ -379,17 +380,19 @@ Lapiz.Test("CollectionsHelper/Namespace/Properties", function(t){
 
   var ns = Lapiz.Namespace(function(){
     this.properties({
-      "*id" : "int",
-      "name": {
+      "*id"  : "int",
+      "name" : {
         "get": function(){ return this.attr.name; },
         "set": Lapiz.parse.string
       },
-      "age" : "int",
-      "+foo" : function(){ return "Foo"; }
+      "age"  : "int",
+      "+foo" : function(){ return "Foo"; },
+      "+baz" : null
     },{
-      "id"  : 12,
-      "name": "Adam",
-      "age" : 32
+      "id"   : 12,
+      "name" : "Adam",
+      "age"  : 32,
+      "baz"  : "enders eye"
     });
 
     try {
@@ -404,6 +407,7 @@ Lapiz.Test("CollectionsHelper/Namespace/Properties", function(t){
   ns.foo === "Foo"                     || t.error("Expected 'Foo', got " + ns.foo);
   ns.id === 12                         || t.error("Expected 12, got " + ns.id);
   errStr === "Invalid value for 'bar'" || t.error("Expected error");
+  ns.baz === "enders eye"              || t.error("Expected 'enders eye'");
 
   errStr = false;
   try {
@@ -440,8 +444,17 @@ Lapiz.Test("CollectionsHelper/ArgMapLevels", function(t){
     }();
   }(3,4);
 
-  console.log(coord);
-
   coord['x'] === 3 || t.error("expected 3");
   coord['y'] === 4 || t.error("expected 4");
+  Object.keys(coord).length === 2 || t.error("expected 2 values");
+});
+
+Lapiz.Test("CollectionsHelper/TooManyArgMapLevels", function(t){
+  var coord = function(x,y){
+    return function(){
+      return Lapiz.argMap(100);
+    }();
+  }(3,4);
+
+  Object.keys(coord).length === 0 || t.error("expected empty map");
 });

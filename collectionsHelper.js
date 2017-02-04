@@ -371,7 +371,7 @@ Lapiz.Module("Collections", function($L){
         desc.set = _setReadOnly;
         Object.defineProperty(obj, property, desc);
         if (values && Object.hasOwnProperty.call(values, property) ){
-          attr[property] = values[property]; 
+          attr[property] = values[property];
         }
       } else {
         // If the property name begins with *, it is a setOnce, the setter will not
@@ -435,7 +435,7 @@ Lapiz.Module("Collections", function($L){
       name = fn.name;
     }
     $L.typeCheck.func(fn, "Expected fn for binder");
-    if (!$L.typeCheck.str(name) && name !== ""){
+    if (!$L.typeCheck.str(name) || name === ""){
       $L.Err.toss("Invalid name for binder function");
     }
     Object.defineProperty(proto, name, {
@@ -622,7 +622,7 @@ Lapiz.Module("Collections", function($L){
     while (levels > 0){
       levels--;
       caller = caller.caller;
-      if (caller === undefined){
+      if (caller === undefined || caller === null){
         return map; 
       }
     }
