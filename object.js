@@ -166,7 +166,7 @@ Lapiz.Module("Obj", ["Events"], function($L){
   $L.set.binder(_clsDefProto, function meth(name, fn){
     if (fn === undefined){
       fn = name;
-      name = fn.name;
+      name = $L.getFnName(fn);
     }
     _classBuilderWM.get(this).methods[name] = fn;
   });

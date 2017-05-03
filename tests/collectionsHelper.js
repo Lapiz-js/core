@@ -266,7 +266,8 @@ Lapiz.Test("CollectionsHelper/BadConstructorsTest", function(t){
   errMsg(function(){Lapiz.set.getter(function foo(){});}) === "Getter called without object: foo" || t.error("Expected getter error");
   errMsg(function(){Lapiz.set.getter({}, "", function(){});}) === "Getter name cannot be empty string" || t.error("Expected setterMethod error");
   errMsg(function(){Lapiz.set.setProperties();}) === "Got undefined for obj in setProperties" || t.error("Expected setProperties error");
-  errMsg(function(){Lapiz.set.binder({},function(){});}) === "Invalid name for binder function" || t.error("Expected 'Invalid name for binder function' error");
+  errMsg(function(){Lapiz.set.binder({},function(){});}) === "Expected named function, got anonymous" || t.error("Expected 'Expected named function, got anonymous' error");
+  errMsg(function(){Lapiz.set.binder({},"",function foo(){});}) === "Invalid name for binder function" || t.error("Expected 'Invalid name for binder function' error");
   
   var em = errMsg(function(){
     var p = {};

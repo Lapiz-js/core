@@ -130,6 +130,11 @@ Lapiz.Test("Obj/Change", function(t){
     person.name === "Adam"  || t.error("Expected 'Adam', got " + person.name);
   });
 
+  Lapiz.Test("Obj/Statics", function(t){
+    var Person = Lapiz.Cls(_Person);
+    Person(6, "Adam", "admin", true);
+  });
+
   Lapiz.Test("Obj/SetMany", ["Event/", "CollectionsHelper/ArgMap"], function(t){
     var Person = Lapiz.Cls(_Person);
 

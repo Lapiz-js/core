@@ -100,7 +100,7 @@ Lapiz.Module("Collections", function($L){
     } else if ($L.typeCheck.func(name) && name.name !== ""){
       bind = fn;
       fn = name;
-      name = fn.name;
+      name = $L.getFnName(fn);
     } else {
       Lapiz.Err.toss("SetterMethod requires either name and func or named function");
     }
@@ -143,7 +143,7 @@ Lapiz.Module("Collections", function($L){
       $L.assert(name !=="", "Getter name cannot be empty string");
     } else if ($L.typeCheck.func(name) && name.name !== ""){
       fn = name;
-      name = fn.name;
+      name = $L.getFnName(fn);
     } else if ($L.typeCheck.arr(name)){
       $L.each(name, function(getterFn){
         $L.set.getter(obj, getterFn);
@@ -432,7 +432,7 @@ Lapiz.Module("Collections", function($L){
   $L.set.meth($L.set, function binder(proto, name, fn){
     if (fn === undefined){
       fn = name;
-      name = fn.name;
+      name = $L.getFnName(fn);
     }
     $L.typeCheck.func(fn, "Expected fn for binder");
     if (!$L.typeCheck.str(name) || name === ""){
