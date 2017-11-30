@@ -66,6 +66,25 @@
     admins[70] === undefined || t.error("Did not expected id 70 in list");
   });
 
+  Lapiz.Test("Index/Exclude", ["Index/Index"], function(t){
+    var Person = Lapiz.Cls(_Person);
+
+    Lapiz.Index(Person);
+    Person.Exclude = function(person){
+      return person.id === 0
+    };
+
+    Person(0, "Stephen", "admin", true);
+    Person(70, "Lauren", "editor", true);
+    Person(60, "Adam", "admin", true);
+
+    var keys = Person.keys;
+    keys.length === 2 || t.error("Expected 2 keys, got "+keys.length);
+    Person.get(70) !== undefined || t.error("Expected id 70 in list");
+    Person.get(60) !== undefined || t.error("Expected id 60 in list");
+    Person.get(0) === undefined  || t.error("Did not expect id 0 in list");
+  });
+
   Lapiz.Test("Index/GetByFunc", ["Index/Index"], function(t){
     var Person = Lapiz.Cls(_Person);
 

@@ -117,6 +117,12 @@ Lapiz.Test("Obj/Change", function(t){
     });
 
     cls.meth(function setMany(props){this.setMany(props);});
+    cls.getter(function activeStr(){
+      if (this.attr.active){
+        return "Active";
+      }
+      return "Inactive";
+    });
   };
 
   Lapiz.Test("Obj/Index", function(t){
@@ -150,6 +156,20 @@ Lapiz.Test("Obj/Change", function(t){
     person.name === "Lauren" || t.error("Name was not set correctly");
     person.role === "editor" || t.error("Role was not set correctly");
     person.active === true   || t.error("Active was not set correctly");
+  });
+
+  Lapiz.Test("Obj/ClsGetter", ["Event/", "CollectionsHelper/ArgMap"], function(t){
+    var Person = Lapiz.Cls(_Person);
+
+    var name, role, active;
+    var adam = Person(6, "Adam", "admin", false);
+    var lauren = Person(8, "Lauren", "editor", true);
+
+
+    adam.activeStr   === "Inactive" || t.error("activeStr did not return 'Inactive'");
+    lauren.activeStr === "Active"   || t.error("activeStr did not return 'Active' for lauren");
+    adam.active = true;
+    adam.activeStr   === "Active"   || t.error("activeStr did not return 'Active'");
   });
 
   Lapiz.Test("Obj/ChangeOnSetAll", ["Event/", "Obj/SetMany"], function(t){

@@ -72,7 +72,15 @@ Lapiz.Module("Index", function($L){
       _primary(primaryFunc(obj), obj);
     }
 
+    // > indexedClass.Exclude
+    // This can be set to a function that takes an instance of the class and
+    // returns a boolean. If it returns true then the object will not be
+    // indexed.
+
     cls.on.create(function(obj){
+      if ($L.typeCheck.nested(domain, "Exclude", "func") && domain.Exclude(obj)) {
+        return;
+      }
       obj.on.change(_upsert);
       obj.on.remove(function(obj){
         if ($L.typeCheck.nested(obj, "on", "change", "deregister", "func")){
@@ -113,4 +121,5 @@ Lapiz.Module("Index", function($L){
   // > Lapiz.Index.defaultPrimary
   // Sets the default primary key name. It defaults to "id".
   $L.Index.defaultPrimary = "id";
+
 });
