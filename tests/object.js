@@ -20,6 +20,7 @@ Lapiz.Test("Obj/Cls", function(t){
 
   var lastIdCreated;
   Person.on.create = function(person){
+    console.log(person);
     lastIdCreated = person.id;
   }
 

@@ -72,13 +72,13 @@ Lapiz.Module("Index", function($L){
       _primary(primaryFunc(obj), obj);
     }
 
-    // > indexedClass.Exclude
+    // > indexedClass.exclude
     // This can be set to a function that takes an instance of the class and
     // returns a boolean. If it returns true then the object will not be
     // indexed.
 
     cls.on.create(function(obj){
-      if ($L.typeCheck.nested(domain, "Exclude", "func") && domain.Exclude(obj)) {
+      if ($L.typeCheck.nested(domain, "exclude", "func") && domain.exclude(obj)) {
         return;
       }
       obj.on.change(_upsert);

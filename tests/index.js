@@ -66,11 +66,11 @@
     admins[70] === undefined || t.error("Did not expected id 70 in list");
   });
 
-  Lapiz.Test("Index/Exclude", ["Index/Index"], function(t){
+  Lapiz.Test("Index/exclude", ["Index/Index"], function(t){
     var Person = Lapiz.Cls(_Person);
 
     Lapiz.Index(Person);
-    Person.Exclude = function(person){
+    Person.exclude = function(person){
       return person.id === 0
     };
 

@@ -24,7 +24,7 @@ Lapiz.Test("CollectionsHelper/Remove", function(t){
   arr[2] === 5 || t.error('Should have removed 1: '+ arr.join(',') );
 });
 
-Lapiz.Test("CollectionsHelper/ArrayEach", function(t){
+Lapiz.Test("CollectionsHelper/each/Array", function(t){
   var arr = [3,1,4,5,9];
   var dbl = [];
   Lapiz.each(arr, function(v,i){
@@ -35,7 +35,7 @@ Lapiz.Test("CollectionsHelper/ArrayEach", function(t){
   dbl[2] === 8 || t.error('Should have 8');
 });
 
-Lapiz.Test("CollectionsHelper/ArrayEachFind", function(t){
+Lapiz.Test("CollectionsHelper/each/ArrayFind", function(t){
   var arr = [
     {
       "name": "Adam",
@@ -60,7 +60,7 @@ Lapiz.Test("CollectionsHelper/ArrayEachFind", function(t){
   idx === -1 || t.error("Expected -1");
 });
 
-Lapiz.Test("CollectionsHelper/ObjectEach", function(t){
+Lapiz.Test("CollectionsHelper/each/Object", function(t){
   var obj = {
     "A":"apple",
     "B":"bannana",
@@ -72,7 +72,19 @@ Lapiz.Test("CollectionsHelper/ObjectEach", function(t){
   });
 });
 
-Lapiz.Test("CollectionsHelper/ObjectEachFind", function(t){
+Lapiz.Test("CollectionsHelper/each/nullOrUndefined", function(t){
+  var x = Lapiz.each(null, function(v,k){
+    t.error("Invoked each function for null");
+  });
+  x === undefined || t.error("Expected undefined for null");
+
+  x = Lapiz.each(undefined, function(v,k){
+    t.error("Invoked each function for undefined");
+  });
+  x === undefined || t.error("Expected undefined for undefined");
+});
+
+Lapiz.Test("CollectionsHelper/each/ObjectFind", function(t){
   var objs = {
       "Adam"   : "admin",
       "Lauren" : "editor",
