@@ -1,7 +1,7 @@
 Lapiz.Module("Dictionary", function($L){
 
-  // > Lapiz.Dictioanry()
-  // > Lapiz.Dictioanry(seed)
+  // > Lapiz.Dictionary()
+  // > Lapiz.Dictionary(seed)
   // Dictionaries allow for the storage of key/value pairs in a container that
   // will emit events as the contents change.
   //

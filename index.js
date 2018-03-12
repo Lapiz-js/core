@@ -1,4 +1,4 @@
-Lapiz.Module("Index", function($L){
+Lapiz.Module("Index", ["Collections"], function($L){
   // > Lapiz.Index(lapizClass)
   // > Lapiz.Index(lapizClass, primaryFunc)
   // > Lapiz.Index(lapizClass, primaryField)

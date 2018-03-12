@@ -27,7 +27,7 @@ Lapiz.Test("Errors/LogTo", ["Errors/Throw"], function(t){
   }
 
   out.indexOf("Testing Errors") > -1 || t.error("Expect 'Testing Errors' in log");
-  out.indexOf("lapiz/core/tests/errors.js") > -1 || t.error("Expect 'lapiz/core/tests/errors.js' in log");
+  out.indexOf("core/tests/errors.js") > -1 || t.error("Expect 'lapiz/core/tests/errors.js' in log");
 
   Lapiz.Err.logTo = null;
   Lapiz.Err.logTo === nullLogger || t.error("Logging should be set to null logger");

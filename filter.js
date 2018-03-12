@@ -2,7 +2,7 @@ Lapiz.Module("Filter", function($L){
 
   // > Lapiz.Filter(accessor, filterFunc(key, accessor) )
   // > Lapiz.Filter(accessor, field, val)
-  // Filters an accessor based on a function of field.
+  // Filters an accessor based on a function or field.
   //
   // One edge case is that an accessor cannot filter by field
   // for undefined. To do that, you have to create a function
