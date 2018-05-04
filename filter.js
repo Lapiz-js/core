@@ -1,3 +1,4 @@
+// > .ModuleName "Filter"
 Lapiz.Module("Filter", function($L){
 
   // > Lapiz.Filter(accessor, filterFunc(key, accessor) )
@@ -67,6 +68,8 @@ Lapiz.Module("Filter", function($L){
       return _index.length;
     });
 
+    // > filter.each(fn)
+    // Iterates over the collection and calls fn(val, key) on each member.
     $L.set.meth(self, function each(fn){
       var i;
       var l = _index.length;
