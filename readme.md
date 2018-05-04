@@ -61,3 +61,6 @@ childset.parents = childset.all.KeyGroup("parent");
 this.children = childset.parents(this.id);
 
 where the KeyGroup would be a map of lists.
+
+this will also require a "Group" type that just takes an accessor and maintains
+a set of keys. Which I could replace much of the filter logic.
