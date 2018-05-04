@@ -12,16 +12,18 @@ to provide examples of each aspect of setProperties.
 ### TODO: use getFnName everywhere
 to avoid the "bound [name]" problem
 
-### TODO: move Map stuff to set
-so $L.set.meth becomes $L.set.meth
-
 ### TODO: Lapiz.Class constructor: not new flag
-Often, I design applications where the constructor is never meant to be directly invoked, the Upsert method is
+
+Often, I design applications where the constructor is never meant to be directly
+invoked, the Upsert method is
 
 ### TODO: Support err args in init.js
-Right now, everything needs to be an error string, should also support errors passed in directly.
+
+Right now, everything needs to be an error string, should also support errors
+passed in directly.
 
 ### TODO: Reconsider SetOnce as getter
+
 SetOnce is intended to do double duty as a true set once as well as a short hand
 for a getter. Perhaps it would be better to introduce another short hand for
 getter "+getter". The real benefit being a clearer error.
@@ -43,3 +45,19 @@ cls.properties({
   "3 active": "bool"
 });
 ... maybe, I got to think about that.
+
+### TODO: Key based sets
+I keep running into this pattern where I have
+Parent->child
+and on parent I defin
+
+this.children = childset.all.Filter("parent", this.id);
+
+Which is inefficient because now when a child is added, it is tested against
+each parent.
+
+Better would be
+childset.parents = childset.all.KeyGroup("parent");
+this.children = childset.parents(this.id);
+
+where the KeyGroup would be a map of lists.
