@@ -1,3 +1,4 @@
+// > .ModuleName "Sorter"
 Lapiz.Module("Sorter", function($L){
 
   // > Lapiz.Sort(accessor, sorterFunc(keyA, keyB, accessor))

@@ -1,3 +1,4 @@
+// .ModuleName "Collections"
 Lapiz.Module("Collections", function($L){
   // > Lapiz.set
   // Defined in init. This is used as a namespace for many helpers in setting

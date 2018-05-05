@@ -1,3 +1,4 @@
+// > .ModuleName "Dependency"
 Lapiz.Module("Dependency", function($L){
   var _dependencies = {};
 

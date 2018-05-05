@@ -1,3 +1,4 @@
+// > .ModuleName "Errors"
 Lapiz.Module("Errors", ["Events", "Collections"], function($L){
 
   // > Lapiz.Err

@@ -1,3 +1,4 @@
+// > .ModuleName "Dictionary"
 Lapiz.Module("Dictionary", function($L){
 
   // > Lapiz.Dictionary()

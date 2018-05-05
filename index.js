@@ -1,3 +1,4 @@
+// > .ModuleName "Index"
 Lapiz.Module("Index", ["Collections"], function($L){
   // > Lapiz.Index(lapizClass)
   // > Lapiz.Index(lapizClass, primaryFunc)

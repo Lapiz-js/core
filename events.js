@@ -1,3 +1,4 @@
+// > .ModuleName "Events"
 Lapiz.Module("Events", ["Collections"], function($L){
 
   // > Lapiz.Event()

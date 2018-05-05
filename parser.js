@@ -1,3 +1,4 @@
+// > .ModuleName "Parser"
 Lapiz.Module("Parser", function($L){
   function resolveParser(parser){
     if ($L.typeCheck.str(parser) && $L.parse[parser] !== undefined){

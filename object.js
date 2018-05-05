@@ -1,3 +1,4 @@
+// > .ModuleName "Obj"
 Lapiz.Module("Obj", ["Events"], function($L){
 
   var _privProto = $L.Map();
