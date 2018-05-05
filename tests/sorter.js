@@ -8,7 +8,7 @@ Most browsers will correctly sort the list with
   });
 However, IE expects a ternary value with 1 = a>b, 0 = a==b and -1 = a<b
 For that reason, the following pattern appears through out these tests
-as well as withing the Lapiz sorter module
+as well as with in the Lapiz sorter module
   return (a > b ? 1 : (b > a ? -1 : 0));
 */
 

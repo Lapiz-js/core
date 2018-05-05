@@ -32,10 +32,6 @@ Lapiz.Module("Filter", function($L){
 
     $L.typeCheck.func(filterFn, "Filter must be invoked with function or attriubte and value");
 
-    accessor.each(function(val, key){
-      if (filterFn(key, accessor)) { _index.push(key); }
-    });
-
     // > filter.Accessor
     // Returns a reference to self
     $L.set(self, "Accessor", self);
@@ -194,6 +190,11 @@ Lapiz.Module("Filter", function($L){
       if ($L.typeCheck.nested(filterFn, "on", "change", "deregister", "func")){
         filterFn.on.change.deregister(self.ForceRescan);
       }
+    });
+
+    // add initial values
+    accessor.each(function(val, key){
+      if (filterFn(key, accessor)) { _index.push(key); }
     });
 
     Object.freeze(self);

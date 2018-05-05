@@ -18,8 +18,6 @@
     }
   };
 
-  var fruit = ["apple" ,"bananna" ,"cantaloup" ,"dates" ,"elderberry"];
-
   Lapiz.Test("Filter/FilterFunc", ["Dictionary/"], function(t){
     var dict = Lapiz.Dictionary(data);
     var nameFilter = Lapiz.Filter(dict, function(key, accessor){
@@ -49,9 +47,9 @@
     dict(6,"cantaloup");
     dict(3,"apricot");
 
-    flag                   || t.error("filter insert event did not fire");
-    filter.has(6)          || t.error("cantaloup is not in the list");
-    !filter.has(3)         || t.error("apricot is in the list, but should not be");
+    flag           || t.error("filter insert event did not fire");
+    filter.has(6)  || t.error("cantaloup is not in the list");
+    !filter.has(3) || t.error("apricot is in the list, but should not be");
   });
 
   Lapiz.Test("Filter/Remove", ["Dictionary/"], function(t){
@@ -176,8 +174,8 @@
       return accessor(key) < "b";
     };
 
-    !filter.has(3)  || t.error("Did not expect 3");
-    filter.has(1) || t.error("Expect 1");
+    !filter.has(3) || t.error("Did not expect 3");
+    filter.has(1)  || t.error("Expect 1");
   });
 
   Lapiz.Test("Filter/FuncOnChange", ["Dictionary/"], function(t){
@@ -205,7 +203,7 @@
     gtEvent.fire();
 
     filter.has(5)  || t.error("Expected 5");
-    !filter.has(3)  || t.error("Did not expect 3");
+    !filter.has(3) || t.error("Did not expect 3");
     !filter.has(1) || t.error("Did not expect 1");
 
     var filterFn2 = function(key, accessor){

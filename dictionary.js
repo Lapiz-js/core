@@ -37,6 +37,7 @@ Lapiz.Module("Dictionary", function($L){
         });
       }
     }
+    val = undefined; // not sure if this matters for GC
 
     // > dict(key)
     // > dict(key, val)
@@ -215,7 +216,7 @@ Lapiz.Module("Dictionary", function($L){
 
     // > dict.Accessor
     // > dict.Accessor(key)
-    // The accessor is a read-only iterface to the dictionary
+    // The accessor is a read-only interface to the dictionary
     //
     // * accessor.length
     // * accessor.keys
