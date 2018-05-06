@@ -30,6 +30,11 @@ Lapiz.Module("Group", function($L){
     // Returns a filter.
     $L.set.meth(self, function Filter(filterOrField, val){ return $L.Filter(self, filterOrField, val); });
 
+    // > group.GroupBy(attribute)
+    // > group.GroupBy(groupByFunction)
+    // Returns a GroupBy with the group as the accessor
+    $L.set.meth(self, function GroupBy(funcOrField){ return $L.GroupBy(self, funcOrField); });
+
     // > group.has(key)
     // Returns a bool indicating if the group contains the key
     $L.set.meth(self, function has(key){
@@ -163,6 +168,7 @@ Lapiz.Module("Group", function($L){
     $L.set.copyProps(self.Accessor, self, "Accessor", "&length", "has", "each", "on", "Sort", "Filter", "&keys");
     self.Accessor._cls = $L.Accessor;
 
+    Object.freeze(self.Accessor);
     Object.freeze(self);
     return self;
   });

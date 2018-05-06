@@ -67,6 +67,18 @@
     filter.has(4)  || t.error("Expected 4");
   });
 
+  Lapiz.Test("Group/GroupBy", ["Group/AddRemove"], function(t){
+    var dict = Lapiz.Dictionary(data);
+    var group = Lapiz.Group(dict);
+    group.Add(1);
+    group.Add(3);
+    group.Add(4);
+
+    var groupBy = group.GroupBy("fruit");
+
+    groupBy("cantaloup").length === 1 || t.error("Expected 1 cantaloup");
+  });
+
   Lapiz.Test("Group/Each", ["Group/AddRemove"], function(t){
     var dict = Lapiz.Dictionary(data);
     var group = Lapiz.Group(dict);
@@ -266,8 +278,7 @@
   });
 
   Lapiz.Test("GroupBy/Rescan", ["GroupBy/Events"], function(t){
-    var dict = Lapiz.Dictionary(data);
-    var groupBy = Lapiz.GroupBy(dict, "role");
+    var groupBy = Lapiz.Dictionary(data).GroupBy("role");
     
     var admins = groupBy("admin");
     var editors = groupBy("editor");
@@ -293,5 +304,17 @@
     
     // reset data
     data[66].role = "editor";
+    data[39].role = "editor";
+  });
+
+  Lapiz.Test("GroupBy/Filter", ["GroupBy/Events"], function(t){
+    var filter = Lapiz.Dictionary(data).Filter(function(key, accessor){
+      return ["admin", "editor"].indexOf(accessor(key).role) > -1;
+    });
+    var groupBy = filter.GroupBy("role");
+    
+    groupBy("admin").length === 2 || t.error("Expected two admins");
+    groupBy("editor").length === 2 || t.error("Expected two editors");
+    !groupBy.has("user")           || t.error("Did not expect any users");
   });
 })();

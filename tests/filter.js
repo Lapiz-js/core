@@ -30,6 +30,18 @@
     !nameFilter.has(4) || t.error("Did not expected 4");
   });
 
+  Lapiz.Test("Filter/Accessor", ["Dictionary/"], function(t){
+    var dict = Lapiz.Dictionary(data);
+    var nameFilter = Lapiz.Filter(dict, function(key, accessor){
+      return accessor(key).name > "B";
+    });
+    var accessor = nameFilter.Accessor;
+
+    console.log(accessor.has(1));
+    accessor.length === 2          || t.error("Expected two items in accessor");
+    accessor(1).name === "Stephen" || t.error("Expected 'Stephen'");
+  });
+
   Lapiz.Test("Filter/Insert", ["Dictionary/"], function(t){
     var dict = Lapiz.Dictionary();
     dict(1,"apple");

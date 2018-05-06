@@ -206,14 +206,19 @@ Lapiz.Module("Dictionary", function($L){
     });
 
     // > dict.Sort(sorterFunction)
-    // > dict.Sort(attribute)
-    // Returns a Sorter with the dictionary as the accessor
-    self.Sort = function(funcOrField){ return $L.Sort(self, funcOrField); };
+    // > dict.Sort(fieldName)
+    // Returns a Sorter
+    $L.set.meth(self, function Sort(funcOrField){ return $L.Sort(self, funcOrField); });
 
     // > dict.Filter(filterFunction)
-    // > dict.Filter(attribute, val)
-    // Returns a Filter with the dictionary as the accessor
-    self.Filter = function(filterOrAttr, val){ return $L.Filter(self, filterOrAttr, val); };
+    // > dict.Filter(field, val)
+    // Returns a dict.
+    $L.set.meth(self, function Filter(filterOrField, val){ return $L.Filter(self, filterOrField, val); });
+
+    // > dict.GroupBy(attribute)
+    // > dict.GroupBy(groupByFunction)
+    // Returns a GroupBy with the dict as the accessor
+    $L.set.meth(self, function GroupBy(funcOrField){ return $L.GroupBy(self, funcOrField); });
 
     // > dict.Accessor
     // > dict.Accessor(key)
@@ -228,11 +233,12 @@ Lapiz.Module("Dictionary", function($L){
     // * accessor.on.remove
     // * accessor.Sort
     // * accessor.Filter
-    self.Accessor = function(key){
+    // * accessor.GroupBy
+    $L.set.meth(self, function Accessor(key){
       return _dict[key];
-    };
-    $L.set.copyProps(self.Accessor, self, "Accessor", "&length", "has", "each", "on", "Sort", "Filter", "&keys");
-    self.Accessor._cls = $L.Accessor;
+    });
+    $L.set.copyProps(self.Accessor, self, "Accessor", "&length", "has", "each", "on", "Sort", "Filter", "GroupBy", "&keys");
+    $L.set(self.Accessor, "_cls", $L.Accessor)
 
     Object.freeze(self.Accessor);
     Object.freeze(self);

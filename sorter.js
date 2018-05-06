@@ -69,8 +69,10 @@ Lapiz.Module("Sorter", function($L){
     _index.sort(_sortFn);
 
     // > sort.has(key)
+    // On sort, the has method just passes through to the underlying accessor.
 
     // > sort.Accessor
+    // Returns the underlying accessor.
 
     // > sort.Sort(accessor, sorterFunc(keyA, keyB, accessor))
     // > sort.Sort(accessor, fieldName)
@@ -86,8 +88,15 @@ Lapiz.Module("Sorter", function($L){
     // through unnecessary layers of events. Better to create a filter on the
     // sorters accessor.
 
+    // > sort.GroupBy(accessor, filterFunc(key, accessor) )
+    // > sort.GroupBy(accessor, field, val)
+    // It is possible to create a GroupBy on a sorter, but it is not
+    // recommended. The sorting operations do not stack so this just passes the
+    // events through unnecessary layers of events. Better to create a GroupBy
+    // on the sorters accessor.
+
     // > sort.length
-    $L.set.copyProps(self, accessor, "has", "Accessor", "Sort", "Filter", "&length");
+    $L.set.copyProps(self, accessor, "has", "Accessor", "Sort", "Filter", "GroupBy", "&length");
 
     // > sort.keys
     // Read-only property. The keys will be in the order that the sorter has

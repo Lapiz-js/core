@@ -14,6 +14,7 @@ Lapiz.Module("Filter", function($L){
     // > filter(key)
     // Returns the value associated with key, if it exists in the filter
     var self = function(key){
+      key = key.toString();
       if (_index.indexOf(key) > -1) { return accessor(key); }
     };
 
@@ -32,10 +33,6 @@ Lapiz.Module("Filter", function($L){
 
     $L.typeCheck.func(filterFn, "Filter must be invoked with function or attriubte and value");
 
-    // > filter.Accessor
-    // Returns a reference to self
-    $L.set(self, "Accessor", self);
-
     // > filter.Sort(sorterFunction)
     // > filter.Sort(fieldName)
     // Returns a Sorter
@@ -45,6 +42,11 @@ Lapiz.Module("Filter", function($L){
     // > filter.Filter(field, val)
     // Returns a filter.
     $L.set.meth(self, function Filter(filterOrField, val){ return $L.Filter(self, filterOrField, val); });
+
+    // > filter.GroupBy(attribute)
+    // > filter.GroupBy(groupByFunction)
+    // Returns a GroupBy with the filter as the accessor
+    $L.set.meth(self, function GroupBy(funcOrField){ return $L.GroupBy(self, funcOrField); });
 
     // > filter.has(key)
     // Returns a bool indicating if the filter contains the key
@@ -192,12 +194,33 @@ Lapiz.Module("Filter", function($L){
       }
     });
 
+    // > filter.Accessor
+    // > filter.Accessor(key)
+    // The accessor is a read-only interface to the filter
+    //
+    // * accessor.length
+    // * accessor.keys
+    // * accessor.has(key)
+    // * accessor.each(fn(val, key))
+    // * accessor.on.insert
+    // * accessor.on.change
+    // * accessor.on.remove
+    // * accessor.Sort
+    // * accessor.Filter
+    // * accessor.GroupBy
+    $L.set(self, function Accessor(key){
+      return self(key);
+    });
+    $L.set.copyProps(self.Accessor, self, "Accessor", "&length", "has", "each", "on", "Sort", "Filter", "GroupBy", "&keys");
+    $L.set(self.Accessor, "_cls", $L.Accessor)
+
     // add initial values
     accessor.each(function(val, key){
       if (filterFn(key, accessor)) { _index.push(key); }
     });
 
     Object.freeze(self);
+    Object.freeze(self.Accessor);
     return self;
   });
 });
