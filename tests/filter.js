@@ -37,7 +37,6 @@
     });
     var accessor = nameFilter.Accessor;
 
-    console.log(accessor.has(1));
     accessor.length === 2          || t.error("Expected two items in accessor");
     accessor(1).name === "Stephen" || t.error("Expected 'Stephen'");
   });
