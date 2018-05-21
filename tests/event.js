@@ -62,7 +62,7 @@ Lapiz.Test("Event/length", ["CollectionsHelper/"], function(t){
   var e = Lapiz.Event();
   e.register(function(){});
 
-  e.fire.length === 1 || t.error("Length should be 1");
+  e.register.length === 1 || t.error("Length should be 1");
 });
 
 Lapiz.Test("Event/LinkProperty", ["CollectionsHelper/"], function(t){

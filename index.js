@@ -56,6 +56,10 @@ Lapiz.Module("Index", ["Collections"], function($L){
     // > indexedClass.Sort(sortField)
     domain.Sort = _primary.Sort;
 
+    // > indexedClass.GroupBy(accessor, field)
+    // > indexedClass.GroupBy(accessor, groupKeyFn(key, accessor) )
+    domain.GroupBy = _primary.GroupBy;
+
     // > indexedClass.remove(key)
     domain.remove = _primary.remove;
 
