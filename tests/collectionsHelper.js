@@ -280,6 +280,7 @@ Lapiz.Test("CollectionsHelper/BadConstructorsTest", function(t){
   errMsg(function(){Lapiz.set.setProperties();}) === "Got undefined for obj in setProperties" || t.error("Expected setProperties error");
   errMsg(function(){Lapiz.set.binder({},function(){});}) === "Expected named function, got anonymous" || t.error("Expected 'Expected named function, got anonymous' error");
   errMsg(function(){Lapiz.set.binder({},"",function foo(){});}) === "Invalid name for binder function" || t.error("Expected 'Invalid name for binder function' error");
+  errMsg(function(){Lapiz.Namespace().getter();}) === "Namespace getter requires at least one argument" || t.error("Expected 'Invalid name for binder function' error");
   
   var em = errMsg(function(){
     var p = {};
@@ -363,6 +364,18 @@ Lapiz.Test("CollectionsHelper/Namespace/Set", function(t){
   ns.A === "apple" || t.error("Expected 'apple', got "+ns.A);
   ns.A = "banana"
   ns.A === "apple" || t.error("Still expected 'apple', got "+ns.A);
+});
+
+Lapiz.Test("CollectionsHelper/Namespace/Getter", function(t){
+  var ns = Lapiz.Namespace(function(){
+    var inc = 0
+    this.getter(function Inc(){
+      inc++
+      return inc;
+    });
+  });
+  ns.Inc === 1 || t.error("Expected 1");
+  ns.Inc === 2 || t.error("Expected 2");
 });
 
 Lapiz.Test("CollectionsHelper/Namespace/SetterMethod", function(t){
